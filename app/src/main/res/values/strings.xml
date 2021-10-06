@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">DailyRecipes</string>
+    <string name="default_recipe_title">Recipes</string>
+    <string name="show">Show</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+</resources>
