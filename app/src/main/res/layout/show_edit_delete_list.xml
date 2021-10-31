@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="right"
-    android:gravity="right">
+    android:layout_gravity="end"
+    android:gravity="end">
 
     <TextView
         android:id="@+id/item_name_tv"
@@ -21,6 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="2dp"
         android:layout_weight="1"
+        android:onClick="onShowClick"
         android:text="@string/show" />
 
     <Button
@@ -29,6 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="2dp"
         android:layout_weight="1"
+        android:onClick="onEditClick"
         android:text="@string/edit" />
 
     <Button
@@ -37,5 +40,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="2dp"
         android:layout_weight="1"
+        android:onClick="onDeleteClick"
         android:text="@string/delete" />
 </LinearLayout>

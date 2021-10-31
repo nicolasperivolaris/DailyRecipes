@@ -1,7 +1,10 @@
 package com.example.dailyrecipes.queries;
 
+import com.example.dailyrecipes.model.Recipe;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public abstract class Query<T> {
     public static final int GET_RECIPE_LIST = 0;
@@ -31,8 +34,10 @@ public abstract class Query<T> {
 
     public abstract int getFlag();
 
+    public abstract String getArg();
+
     protected void printData(String s, PrintWriter out){
-        out.print(s + "\n\n");
+        out.print(s + "\t");
     }
 
     protected void printData(int i, PrintWriter out){
@@ -46,7 +51,8 @@ public abstract class Query<T> {
 
     public void print(PrintWriter out){
         out.print(id + "\t");
-        out.print(getFlag() + "\n");
+        out.print(getFlag() + "\t");
+        out.print(getArg() + "\n");
         out.flush();
     }
 

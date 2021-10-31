@@ -6,21 +6,21 @@ import com.example.dailyrecipes.model.Recipe;
 import java.util.ArrayList;
 
 public class RecipeQuery extends Query<Recipe>{
-
-    protected RecipeQuery(QueryListener run) {
+    int recipeId;
+    public RecipeQuery(int recipeId, QueryListener run) {
         super(run);
+        this.recipeId = recipeId;
     }
 
     @Override
-    protected Recipe formatData(ArrayList<String> rawData) {
+    protected Recipe formatData(ArrayList<String> rawData) throws NumberFormatException{
         if(Integer.parseInt(rawData.get(0)) != id) throw new RuntimeException("Id of the query doesn't match with data");
-        String name = rawData.get(1);
         ArrayList<Ingredient> ingredients = new ArrayList<>();
 
         for (String rawDatum : rawData)
             ingredients.add(toIngredients(rawDatum));
 
-        return new Recipe(name, ingredients);
+        return new Recipe(Integer.parseInt(rawData.get(1)), rawData.get(2), ingredients, rawData.get(3));
     }
 
     private static Ingredient toIngredients(String s){
@@ -31,5 +31,10 @@ public class RecipeQuery extends Query<Recipe>{
     @Override
     public int getFlag() {
         return GET_RECIPE;
+    }
+
+    @Override
+    public String getArg() {
+        return String.valueOf(recipeId);
     }
 }
