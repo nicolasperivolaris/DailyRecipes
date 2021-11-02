@@ -3,7 +3,6 @@ package com.example.dailyrecipes.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,10 +40,10 @@ public class CustomRecipeAdapter extends ArrayAdapter<Recipe> {
         ViewHolder viewHolder;
         if (rowView == null) {
             LayoutInflater inflater = ((Activity) getContext()).getLayoutInflater();
-            rowView = inflater.inflate(R.layout.show_edit_delete_list, parent, false);
+            rowView = inflater.inflate(R.layout.show_delete_ingredient_list, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.text = (TextView) rowView.findViewById(R.id.item_name_tv);
-            viewHolder.btn = rowView.findViewById(R.id.show_bt);
+            viewHolder.btn = rowView.findViewById(R.id.delete_bt);
             rowView.setTag(viewHolder);
         }
         else viewHolder = (ViewHolder) rowView.getTag();

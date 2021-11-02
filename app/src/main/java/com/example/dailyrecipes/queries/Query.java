@@ -2,35 +2,54 @@ package com.example.dailyrecipes.queries;
 
 import com.example.dailyrecipes.model.Recipe;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-public abstract class Query<T> {
+public abstract class Query<Param, Result> {
     public static final int GET_RECIPE_LIST = 0;
     public static final int GET_RECIPE = 1;
     public static final int SET_RECIPE = 2;
     private static int currentId = 0;
     public final int id;
     private final QueryListener listener;
-    private T dataSet;
+    private Param param;
+    private Result dataSet;
 
     protected Query(QueryListener callback){
         id = getNewId();
         this.listener = callback;
     }
 
-    public T getData(){
+    public Result getData(){
         return this.dataSet;
     }
 
-    public void setData(ArrayList<String> s){
-        this.dataSet = formatData(s);
-        Thread t = new Thread(() -> listener.dataReceived());
+    public void setJSONData(String data){
+        try {
+            this.dataSet = formatData(data);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Thread t = new Thread(() -> listener.dataReceived(getData()));
         t.start();
     }
 
-    protected abstract T formatData(ArrayList<String> s);
+    public void setData(Result data){
+        this.dataSet = data;
+    }
+
+    public void setParam(Param param) {
+        this.param = param;
+    }
+
+    public Param getParam() {
+        return param;
+    }
+
+    protected abstract Result formatData(String JSON) throws JSONException;
 
     public abstract int getFlag();
 
@@ -61,6 +80,6 @@ public abstract class Query<T> {
     }
 
     public interface QueryListener{
-        void dataReceived();
+        void dataReceived(Object result);
     }
 }

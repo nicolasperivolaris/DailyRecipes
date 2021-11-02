@@ -3,6 +3,11 @@
     <string name="default_recipe_title">Recipes</string>
     <string name="show">Show</string>
     <string name="edit">Edit</string>
-    <string name="delete">Delete</string>
+    <string name="delete">X</string>
     <string name="recipe_name">Recipe name</string>
+    <string name="name">Name</string>
+    <string name="quantity">Quantity</string>
+    <string name="unit">Unit</string>
+    <string name="add">add</string>
+    <string name="save">Save</string>
 </resources>

@@ -23,52 +23,40 @@ import com.example.dailyrecipes.model.Recipe;
 import com.example.dailyrecipes.queries.RecipeListQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
 
+import java.util.List;
+
 public class HomeFragment extends Fragment{
     ConnectionManager connection;
-    private RecipeListQuery recipeListQuery;
     private final static String TAG = "HomeFragment";
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home2, container, false);
 
         connection = new ViewModelProvider(requireActivity()).get(ConnectionManager.class);
-        recipeListQuery = new RecipeListQuery(() -> setRecipeList());
+        RecipeListQuery recipeListQuery = new RecipeListQuery((res) -> setRecipeList(res));
+        connection.make(recipeListQuery);
 
-        Thread t = new Thread(() -> {
-            int time = 0; boolean send = false;
-            while(time <3000 && !send) {
-                if(connection.isReady()) {
-                    connection.askServer(recipeListQuery);
-                    send = true;
-                }
-                try {
-                    Thread.sleep(time+= 100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        t.start();
         return view;
     }
 
-    private void setRecipeList(){
+    private void setRecipeList(Object result){
+        List<Recipe> recipeList = (List<Recipe>) result;
         requireActivity().runOnUiThread(() -> {
-            Recipe[] recipes = new Recipe[recipeListQuery.getData().size()];
-            recipes = recipeListQuery.getData().toArray(recipes);
+            Recipe[] recipes = new Recipe[recipeList.size()];
+            recipes = recipeList.toArray(recipes);
             GridView recipesLV = requireActivity().findViewById(R.id.recipe_list);
             recipesLV.setAdapter(new ImageAdapter(requireActivity(), recipes));
             Recipe[] finalRecipes = recipes;
             recipesLV.setOnItemClickListener((parent, v, position, id) -> {
                 Bundle bundle = new Bundle();
-                bundle.putInt("id", finalRecipes[position].getId());
+                bundle.putParcelable("recipe", finalRecipes[position]);
                 ShowRecipeFragment fragment = new ShowRecipeFragment();
                 fragment.setArguments(bundle);
                 getParentFragmentManager().beginTransaction()
+                        .detach(this)
                         .add(R.id.fragment_container_view, fragment)
                         .setReorderingAllowed(true)
-                        .addToBackStack("home") // name can be null
+                        .addToBackStack(null)
                         .commit();
                     }
             );

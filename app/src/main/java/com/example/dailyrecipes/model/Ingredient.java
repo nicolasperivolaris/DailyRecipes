@@ -1,13 +1,18 @@
 package com.example.dailyrecipes.model;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Ingredient {
+    private int id;
     private String name;
-    private String unity;
+    private Unit unit;
     private float quantity;
 
-    public Ingredient(String name, String unity, float quantity) {
+    public Ingredient(int id, String name, Unit unit, float quantity) {
+        this.id = id;
         this.name = name;
-        this.unity = unity;
+        this.unit = unit;
         this.quantity = quantity;
     }
 
@@ -19,12 +24,12 @@ public class Ingredient {
         this.name = name;
     }
 
-    public String getUnity() {
-        return unity;
+    public Unit getUnit() {
+        return unit;
     }
 
-    public void setUnity(String unity) {
-        this.unity = unity;
+    public void setUnit(Unit unit) {
+        this.unit = unit;
     }
 
     public float getQuantity() {
@@ -33,5 +38,21 @@ public class Ingredient {
 
     public void setQuantity(float quantity) {
         this.quantity = quantity;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(int id){
+        this.id = id;
+    }
+
+    public static Ingredient convertJSON(JSONObject jsonObject) throws JSONException{
+        int id = jsonObject.getInt("Id");
+        String name = jsonObject.getString("Name");
+        float quantity = (float) jsonObject.getDouble("Quantity");
+        Unit unit = Unit.convertJSON(jsonObject.getJSONObject("Unit"));
+        return new Ingredient(id, name, unit, quantity);
     }
 }

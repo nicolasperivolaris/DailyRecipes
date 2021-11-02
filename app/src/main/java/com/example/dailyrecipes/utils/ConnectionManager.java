@@ -2,7 +2,6 @@ package com.example.dailyrecipes.utils;
 
 import android.util.Log;
 
-import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
 
 import com.example.dailyrecipes.queries.Query;
@@ -12,8 +11,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Hashtable;
 
 public class ConnectionManager extends ViewModel {
@@ -21,7 +18,7 @@ public class ConnectionManager extends ViewModel {
     private Socket socket;
     private BufferedReader input;
     private PrintWriter output;
-    private Hashtable<Integer, Query<?>> queries;
+    private Hashtable<Integer, Query<?, ?>> queries;
 
     public ConnectionManager(){
         queries = new Hashtable<>();
@@ -39,8 +36,10 @@ public class ConnectionManager extends ViewModel {
                         formatResponse();
                     }catch(IOException e){
                         Log.i("ConnectionManager: ", "Connection Lost");
+                        e.printStackTrace();
                     }catch (NumberFormatException e){
                         Log.i("ConnectionManager: ", "Data format error");
+                        e.printStackTrace();
                     }
                 }
             } catch (IOException e) {
@@ -50,13 +49,12 @@ public class ConnectionManager extends ViewModel {
         thread.start();
     }
 
-    private Query<?> formatResponse() throws IOException, NumberFormatException {
-        String[] line = input.readLine().split("\t");
-        int queryId = Integer.parseInt(line[0]);
-        Query<?> q = queries.get(queryId);
-        if(q != null && q.getData() == null){
-            ArrayList<String> lines = new ArrayList<>(Arrays.asList(line));
-            q.setData(lines);
+    private Query<?, ?> formatResponse() throws IOException, NumberFormatException {
+        String line = input.readLine();
+        String queryIdString = line.split("\t")[0];
+        Query<?, ?> q = queries.get(Integer.parseInt(queryIdString));
+        if(q != null){
+            q.setJSONData(line.substring(queryIdString.length()));
         }
         return q;
     }
@@ -77,6 +75,25 @@ public class ConnectionManager extends ViewModel {
                 }
             }
         });
+        t.start();
+    }
+
+    public void make(Query<?,?> query){
+        Thread t = new Thread(() -> {
+            int time = 0; boolean send = false;
+            while(time <3000 && !send) {
+                if(isReady()) {
+                    askServer(query);
+                    send = true;
+                }
+                try {
+                    Thread.sleep(time+= 100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         t.start();
     }
 
