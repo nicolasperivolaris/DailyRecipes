@@ -19,11 +19,12 @@ import com.example.dailyrecipes.queries.SaveRecipeQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
 import com.example.dailyrecipes.utils.IngredientsAdapter;
 
-public class ShowRecipeFragment extends Fragment {
+public class RecipeFragment extends Fragment {
     private ConnectionManager connection;
     private int multiplier = 1;
     private IngredientsAdapter ingredientsAdapter;
     private Recipe recipe;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.show_recipe, container, false);
@@ -48,13 +49,13 @@ public class ShowRecipeFragment extends Fragment {
 
     private void savedCallBack(Object result) {
         int errorCode = (int) result;
-        if(errorCode != 0) Toast.makeText(getContext(), "Error while saving", Toast.LENGTH_LONG);
+        if (errorCode != 0) Toast.makeText(getContext(), "Error while saving", Toast.LENGTH_LONG);
         else Toast.makeText(getContext(), "Saved", Toast.LENGTH_LONG);
     }
 
     private void initEditMode(View view) {
-        view.findViewById(R.id.add_bt).setOnClickListener(v->ingredientsAdapter.addRow());
-        ((SwitchCompat)view.findViewById(R.id.edit_sw)).setOnCheckedChangeListener((buttonView, isChecked) -> {
+        view.findViewById(R.id.add_bt).setOnClickListener(v -> ingredientsAdapter.addRow());
+        ((SwitchCompat) view.findViewById(R.id.edit_sw)).setOnCheckedChangeListener((buttonView, isChecked) -> {
             ingredientsAdapter.setEditable(isChecked);
             view.findViewById(R.id.recipeName_tv).setFocusable(false);
             view.findViewById(R.id.add_bt).setEnabled(isChecked);
@@ -80,8 +81,8 @@ public class ShowRecipeFragment extends Fragment {
         Recipe recipe = (Recipe) result;
         multiplier = recipe.getMultiplier();
 
-        getActivity().runOnUiThread(()->{
-            ((TextView)getActivity().findViewById(R.id.recipeName_tv)).setText(recipe.getName());
+        getActivity().runOnUiThread(() -> {
+            ((TextView) getActivity().findViewById(R.id.recipeName_tv)).setText(recipe.getName());
             ingredientsAdapter = new IngredientsAdapter(getContext(), recipe.getIngredients(), multiplier);
 
             ListView list = getActivity().findViewById(R.id.items_list);

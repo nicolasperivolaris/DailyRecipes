@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/navigation_recipe_list">
+
+    <fragment
+        android:id="@id/navigation_shopping_list"
+        android:name="com.example.dailyrecipes.fragments.ShoppingListFragment"
+        android:label="@string/shopping_list"
+        tools:layout="@layout/fragment_shopping_ingredients_list" />
+
+    <fragment
+        android:id="@id/navigation_recipe_list"
+        android:name="com.example.dailyrecipes.fragments.recipelist.RecipeListFragment"
+        android:label="@string/home"
+        tools:layout="@layout/fragment_recipe_list">
+        <action
+            android:id="@+id/action_navigation_recipe_list_to_navigation_show_recipe"
+            app:destination="@id/navigation_show_recipe" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_show_recipe"
+        android:name="com.example.dailyrecipes.fragments.RecipeFragment"
+        android:label="@string/recipe"
+        tools:layout="@layout/show_recipe" />
+
+</navigation>

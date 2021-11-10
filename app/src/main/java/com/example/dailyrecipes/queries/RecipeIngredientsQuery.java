@@ -5,11 +5,10 @@ import com.example.dailyrecipes.model.Recipe;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class RecipeIngredientsQuery extends Query<Void, Recipe>{
+public class RecipeIngredientsQuery extends Query<Void, Recipe> {
     public RecipeIngredientsQuery(Recipe recipe, QueryListener run) {
         super(run);
         setData(recipe);
@@ -38,7 +37,7 @@ public class RecipeIngredientsQuery extends Query<Void, Recipe>{
 
     @Override
     public int getFlag() {
-        return GET_RECIPE;
+        return GET_RECIPE_INGREDIENTS;
     }
 
     @Override

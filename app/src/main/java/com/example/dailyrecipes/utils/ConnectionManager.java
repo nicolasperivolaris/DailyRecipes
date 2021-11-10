@@ -18,26 +18,26 @@ public class ConnectionManager extends ViewModel {
     private Socket socket;
     private BufferedReader input;
     private PrintWriter output;
-    private Hashtable<Integer, Query<?, ?>> queries;
+    private final Hashtable<Integer, Query<?, ?>> queries;
 
-    public ConnectionManager(){
+    public ConnectionManager() {
         queries = new Hashtable<>();
     }
 
-    public void connect(String ip, int port){
-        if(socket != null && !socket.isConnected()) return;
+    public void connect(String ip, int port) {
+        if (socket != null && !socket.isConnected()) return;
         Thread thread = new Thread(() -> {
             try {
                 socket = new Socket(ip, port);
                 input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 output = new PrintWriter(socket.getOutputStream());
-                while(socket.isConnected()){
-                    try{
+                while (socket.isConnected()) {
+                    try {
                         formatResponse();
-                    }catch(IOException e){
+                    } catch (IOException e) {
                         Log.i("ConnectionManager: ", "Connection Lost");
                         e.printStackTrace();
-                    }catch (NumberFormatException e){
+                    } catch (NumberFormatException e) {
                         Log.i("ConnectionManager: ", "Data format error");
                         e.printStackTrace();
                     }
@@ -53,18 +53,18 @@ public class ConnectionManager extends ViewModel {
         String line = input.readLine();
         String queryIdString = line.split("\t")[0];
         Query<?, ?> q = queries.get(Integer.parseInt(queryIdString));
-        if(q != null){
+        if (q != null) {
             q.setJSONData(line.substring(queryIdString.length()));
         }
         return q;
     }
 
-    public void askServer(Query query){
+    public void askServer(Query query) {
         queries.put(query.id, query);
         Thread t = new Thread(() -> {
             boolean done = false;
-            while(!done){
-                if(socket.isConnected()){
+            while (!done) {
+                if (socket.isConnected()) {
                     query.print(output);
                     done = true;
                 }
@@ -78,16 +78,17 @@ public class ConnectionManager extends ViewModel {
         t.start();
     }
 
-    public void make(Query<?,?> query){
+    public void make(Query<?, ?> query) {
         Thread t = new Thread(() -> {
-            int time = 0; boolean send = false;
-            while(time <3000 && !send) {
-                if(isReady()) {
+            int time = 0;
+            boolean send = false;
+            while (time < 3000 && !send) {
+                if (isReady()) {
                     askServer(query);
                     send = true;
                 }
                 try {
-                    Thread.sleep(time+= 100);
+                    Thread.sleep(time += 100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -97,7 +98,7 @@ public class ConnectionManager extends ViewModel {
         t.start();
     }
 
-    public boolean isReady(){
+    public boolean isReady() {
         return socket != null && socket.isConnected();
     }
 }

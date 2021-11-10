@@ -55,16 +55,19 @@ public class IngredientsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view = inflater.inflate(R.layout.show_delete_ingredient_list, null, false);
+        View view;
+        if (convertView == null)
+            view = inflater.inflate(R.layout.show_delete_ingredient_list_item, null, false);
+        else view = convertView;
         view.findViewById(R.id.delete_bt).setOnClickListener(v -> {
-         ingredients.remove(position);
-         notifyDataSetChanged();
+            ingredients.remove(position);
+            notifyDataSetChanged();
         });
 
         Ingredient ingredient = ingredients.get(position);
-        ((TextView)view.findViewById(R.id.item_name_tv)).setText(ingredient.getName());
-        ((TextView)view.findViewById(R.id.quantity_tv)).setText(Float.toString(ingredient.getQuantity() * multiplier));
-        ((TextView)view.findViewById(R.id.unit_tv)).setText(ingredient.getUnit().getName());
+        ((TextView) view.findViewById(R.id.item_name_tv)).setText(ingredient.getName());
+        ((TextView) view.findViewById(R.id.quantity_tv)).setText(Float.toString(ingredient.getQuantity() * multiplier));
+        ((TextView) view.findViewById(R.id.unit_tv)).setText(ingredient.getUnit().getName());
 
         view.findViewById(R.id.item_name_tv).setFocusable(editable);
         view.findViewById(R.id.quantity_tv).setFocusable(editable);
@@ -74,7 +77,7 @@ public class IngredientsAdapter extends BaseAdapter {
         return view;
     }
 
-    public void addRow(){
+    public void addRow() {
         Ingredient ingredient = new Ingredient(-1, "", null, 0);
         ingredients.add(ingredient);
         notifyDataSetChanged();

@@ -1,9 +1,12 @@
 package com.example.dailyrecipes.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Ingredient {
+public class Ingredient implements Parcelable {
     private int id;
     private String name;
     private Unit unit;
@@ -15,6 +18,25 @@ public class Ingredient {
         this.unit = unit;
         this.quantity = quantity;
     }
+
+    protected Ingredient(Parcel in) {
+        id = in.readInt();
+        name = in.readString();
+        unit = in.readParcelable(Unit.class.getClassLoader());
+        quantity = in.readFloat();
+    }
+
+    public static final Creator<Ingredient> CREATOR = new Creator<Ingredient>() {
+        @Override
+        public Ingredient createFromParcel(Parcel in) {
+            return new Ingredient(in);
+        }
+
+        @Override
+        public Ingredient[] newArray(int size) {
+            return new Ingredient[size];
+        }
+    };
 
     public String getName() {
         return name;
@@ -44,15 +66,37 @@ public class Ingredient {
         return id;
     }
 
-    public void setId(int id){
+    public void setId(int id) {
         this.id = id;
     }
 
-    public static Ingredient convertJSON(JSONObject jsonObject) throws JSONException{
+    public static Ingredient convertJSON(JSONObject jsonObject) throws JSONException {
         int id = jsonObject.getInt("Id");
         String name = jsonObject.getString("Name");
         float quantity = (float) jsonObject.getDouble("Quantity");
         Unit unit = Unit.convertJSON(jsonObject.getJSONObject("Unit"));
         return new Ingredient(id, name, unit, quantity);
+    }
+
+    public JSONObject convertToJSON() throws JSONException {
+        JSONObject result = new JSONObject();
+        result.accumulate("Id", id);
+        result.accumulate("Name", name);
+        result.accumulate("Quantity", quantity);
+        result.accumulate("Unit", unit.convertToJSON());
+        return result;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeParcelable(unit, flags);
+        dest.writeFloat(quantity);
     }
 }

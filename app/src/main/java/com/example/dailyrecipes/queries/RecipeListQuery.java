@@ -4,13 +4,12 @@ import com.example.dailyrecipes.model.Recipe;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RecipeListQuery extends Query<Void, List<Recipe>> {
-    public RecipeListQuery(QueryListener run) {
+    public RecipeListQuery(QueryListener<List<Recipe>> run) {
         super(run);
     }
 
@@ -19,7 +18,7 @@ public class RecipeListQuery extends Query<Void, List<Recipe>> {
         List<Recipe> list = new ArrayList<>();
 
         JSONArray array = new JSONArray(JSON);
-        for (int i=0; i<array.length(); i++) {
+        for (int i = 0; i < array.length(); i++) {
             Recipe recipe = Recipe.convertJSON(array.getJSONObject(i));
             list.add(recipe);
         }

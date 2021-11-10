@@ -1,19 +1,10 @@
 package com.example.dailyrecipes.model;
 
-import android.app.Activity;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
-
-import com.example.dailyrecipes.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,19 +12,17 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Recipe implements Parcelable{
-    private int id;
+public class Recipe implements Parcelable {
+    private final int id;
     private String name;
     private List<Ingredient> ingredients;
     private int multiplier = 1;
-    private String imageName;
+    private final String imageName;
 
     public Recipe(int id, String name, List<Ingredient> ingredients, String imageName) {
         this.id = id;
@@ -70,17 +59,31 @@ public class Recipe implements Parcelable{
         String name = jsonObject.getString("Name");
         String imageName = jsonObject.getString("ImagePath");
         ArrayList<Ingredient> ingredients;
-        if(jsonObject.isNull("Ingredients")) ingredients = null;
+        if (jsonObject.isNull("Ingredients")) ingredients = null;
         else {
             ingredients = new ArrayList<>();
             JSONArray array = jsonObject.getJSONArray("Ingredients");
-            for(int i=0;i<array.length(); i++)
+            for (int i = 0; i < array.length(); i++)
                 ingredients.add(Ingredient.convertJSON(array.getJSONObject(i)));
         }
         return new Recipe(id, name, ingredients, imageName);
     }
 
-    public void setMultiplier(int multiplier){
+    public JSONObject convertToJSON() throws JSONException {
+        JSONObject result = new JSONObject();
+        result.accumulate("Id", id);
+        result.accumulate("Name", name);
+        result.accumulate("ImagePath", imageName);
+        result.accumulate("Multiplier", multiplier);
+        JSONArray ingredients = new JSONArray();
+        for (Ingredient i : this.ingredients) {
+            ingredients.put(i.convertToJSON());
+        }
+        result.accumulate("Ingredients", ingredients);
+        return result;
+    }
+
+    public void setMultiplier(int multiplier) {
         this.multiplier = multiplier;
     }
 
@@ -106,14 +109,14 @@ public class Recipe implements Parcelable{
 
     public Bitmap getImage() {
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL("http://192.168.2.8/"+imageName).openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL("http://192.168.2.8/" + imageName).openConnection();
             connection.connect();
             InputStream input = connection.getInputStream();
             return BitmapFactory.decodeStream(input);
 
         } catch (IOException e) {
             //e.printStackTrace();
-            Log.i("Recipe","no image server");
+            Log.i("Recipe", "no image server");
             return null;
         }
     }

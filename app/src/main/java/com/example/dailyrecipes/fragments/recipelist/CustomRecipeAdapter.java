@@ -1,4 +1,4 @@
-package com.example.dailyrecipes.utils;
+package com.example.dailyrecipes.fragments.recipelist;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,22 +8,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dailyrecipes.R;
-import com.example.dailyrecipes.fragments.ShowRecipeFragment;
+import com.example.dailyrecipes.fragments.RecipeFragment;
 import com.example.dailyrecipes.model.Recipe;
 
 public class CustomRecipeAdapter extends ArrayAdapter<Recipe> {
-    private ListView listView;
-    private View.OnClickListener listener;
-    public CustomRecipeAdapter(Context context, int textViewResourceId, Recipe[] objects, ListView listView) {
+    public CustomRecipeAdapter(Context context, int textViewResourceId, Recipe[] objects) {
         super(context, textViewResourceId, objects);
-        this.listView = listView;
-        this.listener = listener;
     }
 
 
@@ -40,19 +35,18 @@ public class CustomRecipeAdapter extends ArrayAdapter<Recipe> {
         ViewHolder viewHolder;
         if (rowView == null) {
             LayoutInflater inflater = ((Activity) getContext()).getLayoutInflater();
-            rowView = inflater.inflate(R.layout.show_delete_ingredient_list, parent, false);
+            rowView = inflater.inflate(R.layout.show_delete_ingredient_list_item, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.text = (TextView) rowView.findViewById(R.id.item_name_tv);
+            viewHolder.text = rowView.findViewById(R.id.item_name_tv);
             viewHolder.btn = rowView.findViewById(R.id.delete_bt);
             rowView.setTag(viewHolder);
-        }
-        else viewHolder = (ViewHolder) rowView.getTag();
+        } else viewHolder = (ViewHolder) rowView.getTag();
 
         viewHolder.text.setText(recipe.getName());
         Bundle bundle = new Bundle();
         bundle.putInt("id", recipe.getId());
-        viewHolder.btn.setOnClickListener(v -> ((AppCompatActivity)getContext()).getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container_view, ShowRecipeFragment.class, bundle)
+        viewHolder.btn.setOnClickListener(v -> ((AppCompatActivity) getContext()).getSupportFragmentManager().beginTransaction()
+                .add(R.id.fragment_container_view, RecipeFragment.class, bundle)
                 .setReorderingAllowed(true)
                 .addToBackStack("home") // name can be null
                 .commit());

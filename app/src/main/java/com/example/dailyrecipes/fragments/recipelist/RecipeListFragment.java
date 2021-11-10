@@ -1,9 +1,7 @@
-package com.example.dailyrecipes.fragments;
+package com.example.dailyrecipes.fragments.recipelist;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -19,18 +17,20 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.dailyrecipes.R;
+import com.example.dailyrecipes.fragments.RecipeFragment;
 import com.example.dailyrecipes.model.Recipe;
 import com.example.dailyrecipes.queries.RecipeListQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
 
 import java.util.List;
 
-public class HomeFragment extends Fragment{
+public class RecipeListFragment extends Fragment {
     ConnectionManager connection;
     private final static String TAG = "HomeFragment";
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home2, container, false);
+        View view = inflater.inflate(R.layout.fragment_recipe_list, container, false);
 
         connection = new ViewModelProvider(requireActivity()).get(ConnectionManager.class);
         RecipeListQuery recipeListQuery = new RecipeListQuery((res) -> setRecipeList(res));
@@ -39,8 +39,7 @@ public class HomeFragment extends Fragment{
         return view;
     }
 
-    private void setRecipeList(Object result){
-        List<Recipe> recipeList = (List<Recipe>) result;
+    private void setRecipeList(List<Recipe> recipeList) {
         requireActivity().runOnUiThread(() -> {
             Recipe[] recipes = new Recipe[recipeList.size()];
             recipes = recipeList.toArray(recipes);
@@ -48,37 +47,42 @@ public class HomeFragment extends Fragment{
             recipesLV.setAdapter(new ImageAdapter(requireActivity(), recipes));
             Recipe[] finalRecipes = recipes;
             recipesLV.setOnItemClickListener((parent, v, position, id) -> {
-                Bundle bundle = new Bundle();
-                bundle.putParcelable("recipe", finalRecipes[position]);
-                ShowRecipeFragment fragment = new ShowRecipeFragment();
-                fragment.setArguments(bundle);
-                getParentFragmentManager().beginTransaction()
-                        .detach(this)
-                        .add(R.id.fragment_container_view, fragment)
-                        .setReorderingAllowed(true)
-                        .addToBackStack(null)
-                        .commit();
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("recipe", finalRecipes[position]);
+                        RecipeFragment fragment = new RecipeFragment();
+                        fragment.setArguments(bundle);
+                        getParentFragmentManager().beginTransaction()
+                                .detach(this)
+                                .add(R.id.fragment_container_view, fragment)
+                                .setReorderingAllowed(true)
+                                .addToBackStack(null)
+                                .commit();
                     }
             );
         });
     }
 
     class ImageAdapter extends BaseAdapter {
-        private Context mContext;
-        private Recipe[] data;
+        private final Context mContext;
+        private final Recipe[] data;
+
         public ImageAdapter(Context c, Recipe[] data) {
             mContext = c;
             this.data = data;
         }
+
         public int getCount() {
             return data.length;
         }
+
         public Object getItem(int position) {
             return null;
         }
+
         public long getItemId(int position) {
             return 0;
         }
+
         // create a new ImageView for each item referenced by the Adapter
         public View getView(int position, View convertView, ViewGroup parent) {
             ImageView imageView = new ImageView(mContext);
@@ -89,7 +93,7 @@ public class HomeFragment extends Fragment{
             Thread t = new Thread(() -> {
                 Bitmap img = data[position].getImage();
                 Drawable image = img == null ? ResourcesCompat.getDrawable(getResources(), R.drawable.nofile, getActivity().getTheme())
-                        : new BitmapDrawable(getResources(),img);
+                        : new BitmapDrawable(getResources(), img);
                 requireActivity().runOnUiThread(() -> imageView.setImageDrawable(image));
             });
             t.start();
