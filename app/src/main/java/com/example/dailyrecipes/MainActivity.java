@@ -10,6 +10,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.dailyrecipes.model.Ingredient;
+import com.example.dailyrecipes.model.IngredientsFactory;
 import com.example.dailyrecipes.utils.ConnectionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         ConnectionManager connection = new ViewModelProvider(this).get(ConnectionManager.class);
         connection.connect("192.168.2.1", 5500);
+        IngredientsFactory.ConnectIngredientsFactory(connection);
     }
 
     private List<Ingredient> getShoppingList() {

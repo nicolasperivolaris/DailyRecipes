@@ -1,7 +1,8 @@
-package com.example.dailyrecipes.queries;
+package com.example.dailyrecipes.queries.ingredients;
 
 import com.example.dailyrecipes.model.Ingredient;
 import com.example.dailyrecipes.model.Recipe;
+import com.example.dailyrecipes.queries.Query;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,7 +10,7 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 public class RecipeIngredientsQuery extends Query<Void, Recipe> {
-    public RecipeIngredientsQuery(Recipe recipe, QueryListener run) {
+    public RecipeIngredientsQuery(Recipe recipe, QueryListener<Recipe> run) {
         super(run);
         setData(recipe);
     }

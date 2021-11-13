@@ -18,22 +18,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Recipe implements Parcelable {
-    private final int id;
+    private int id;
     private String name;
+    private String description;
     private List<Ingredient> ingredients;
     private int multiplier = 1;
-    private final String imageName;
+    private String imageName;
 
-    public Recipe(int id, String name, List<Ingredient> ingredients, String imageName) {
+    public Recipe(){
+        ingredients = new ArrayList<>();
+    }
+
+    public Recipe(int id, String name, String description, List<Ingredient> ingredients, int multiplier, String imageName) {
         this.id = id;
         this.name = name;
         this.ingredients = ingredients;
+        this.description = description;
+        this.multiplier = multiplier;
         this.imageName = imageName;
     }
 
     protected Recipe(Parcel in) {
         id = in.readInt();
         name = in.readString();
+        description = in.readString();
         ingredients = new ArrayList<>();
         imageName = in.readString();
     }
@@ -43,8 +51,11 @@ public class Recipe implements Parcelable {
         public Recipe createFromParcel(Parcel in) {
             int id = in.readInt();
             String name = in.readString();
+            String description = in.readString();
+            List<Ingredient> ingredients = in.readArrayList(Ingredient.class.getClassLoader());
+            int multiplier = in.readInt();
             String imageName = in.readString();
-            Recipe recipe = new Recipe(id, name, new ArrayList<>(), imageName);
+            Recipe recipe = new Recipe(id, name,description, ingredients, multiplier, imageName);
             return recipe;
         }
 
@@ -57,24 +68,25 @@ public class Recipe implements Parcelable {
     public static Recipe convertJSON(JSONObject jsonObject) throws JSONException {
         int id = jsonObject.getInt("Id");
         String name = jsonObject.getString("Name");
+        String description = jsonObject.getString("Description");
+        int multiplier = jsonObject.getInt("Multiplier");
         String imageName = jsonObject.getString("ImagePath");
-        ArrayList<Ingredient> ingredients;
-        if (jsonObject.isNull("Ingredients")) ingredients = null;
-        else {
-            ingredients = new ArrayList<>();
+        ArrayList<Ingredient> ingredients = new ArrayList<>();
+        if (!jsonObject.isNull("Ingredients")){
             JSONArray array = jsonObject.getJSONArray("Ingredients");
             for (int i = 0; i < array.length(); i++)
                 ingredients.add(Ingredient.convertJSON(array.getJSONObject(i)));
         }
-        return new Recipe(id, name, ingredients, imageName);
+        return new Recipe(id, name,description, ingredients,multiplier, imageName);
     }
 
     public JSONObject convertToJSON() throws JSONException {
         JSONObject result = new JSONObject();
         result.accumulate("Id", id);
         result.accumulate("Name", name);
-        result.accumulate("ImagePath", imageName);
+        result.accumulate("Description", description);
         result.accumulate("Multiplier", multiplier);
+        result.accumulate("ImagePath", imageName);
         JSONArray ingredients = new JSONArray();
         for (Ingredient i : this.ingredients) {
             ingredients.put(i.convertToJSON());
@@ -89,6 +101,14 @@ public class Recipe implements Parcelable {
 
     public int getMultiplier() {
         return multiplier;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public java.lang.String getName() {
@@ -130,6 +150,9 @@ public class Recipe implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
         dest.writeString(name);
+        dest.writeString(description);
+        dest.writeTypedList(ingredients);
+        dest.writeInt(multiplier);
         dest.writeString(imageName);
     }
 

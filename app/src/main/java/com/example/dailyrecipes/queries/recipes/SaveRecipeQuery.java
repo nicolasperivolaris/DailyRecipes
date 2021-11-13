@@ -1,7 +1,8 @@
-package com.example.dailyrecipes.queries;
+package com.example.dailyrecipes.queries.recipes;
 
 import com.example.dailyrecipes.model.Ingredient;
 import com.example.dailyrecipes.model.Recipe;
+import com.example.dailyrecipes.queries.Query;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +13,7 @@ public class SaveRecipeQuery extends Query<List<Ingredient>, Integer> {
 
     private final Recipe recipe;
 
-    public SaveRecipeQuery(QueryListener callback, Recipe recipe) {
+    public SaveRecipeQuery(QueryListener<Integer> callback, Recipe recipe) {
         super(callback);
         this.recipe = recipe;
     }
@@ -24,7 +25,7 @@ public class SaveRecipeQuery extends Query<List<Ingredient>, Integer> {
 
     @Override
     public int getFlag() {
-        return SET_RECIPE;
+        return SAVE_RECIPE;
     }
 
     @Override

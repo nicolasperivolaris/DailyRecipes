@@ -7,10 +7,11 @@ import java.io.PrintWriter;
 public abstract class Query<Param, Result> {
     public static final int GET_RECIPE_LIST = 0;
     public static final int GET_RECIPE_INGREDIENTS = 1;
-    public static final int ADD_RECIPE_INGREDIENTS = 2;
-    public static final int DEL_RECIPE = 3;
+    public static final int ADD_INGREDIENT = 2;
+    public static final int DELETE_INGREDIENT = 3;
     public static final int GET_SHOPPING_LIST = 4;
-    public static final int ADD_RECIPE = 5;
+    public static final int SAVE_RECIPE = 5;
+    public static final int GET_INGREDIENT_LIST = 6;
 
     private static int currentId = 0;
     public final int id;
@@ -49,10 +50,20 @@ public abstract class Query<Param, Result> {
         return param;
     }
 
+    /**
+     * Format the result of the query
+     * @param JSON
+     * @return
+     * @throws JSONException
+     */
     protected abstract Result formatData(String JSON) throws JSONException;
 
     public abstract int getFlag();
 
+    /**
+     * Parameter of the request
+     * @return
+     */
     public abstract String getArg();
 
     protected void printData(String s, PrintWriter out) {

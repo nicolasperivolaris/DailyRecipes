@@ -1,4 +1,4 @@
-package com.example.dailyrecipes.fragments.recipelist;
+package com.example.dailyrecipes.fragments.recipes;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,13 +11,13 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.Navigation;
 
 import com.example.dailyrecipes.R;
-import com.example.dailyrecipes.fragments.RecipeFragment;
 import com.example.dailyrecipes.model.Recipe;
 
-public class CustomRecipeAdapter extends ArrayAdapter<Recipe> {
-    public CustomRecipeAdapter(Context context, int textViewResourceId, Recipe[] objects) {
+public class RecipeListAdapter extends ArrayAdapter<Recipe> {
+    public RecipeListAdapter(Context context, int textViewResourceId, Recipe[] objects) {
         super(context, textViewResourceId, objects);
     }
 
@@ -35,9 +35,9 @@ public class CustomRecipeAdapter extends ArrayAdapter<Recipe> {
         ViewHolder viewHolder;
         if (rowView == null) {
             LayoutInflater inflater = ((Activity) getContext()).getLayoutInflater();
-            rowView = inflater.inflate(R.layout.show_delete_ingredient_list_item, parent, false);
+            rowView = inflater.inflate(R.layout.show_delete_ingredient_item_list, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.text = rowView.findViewById(R.id.item_name_tv);
+            viewHolder.text = rowView.findViewById(R.id.choice);
             viewHolder.btn = rowView.findViewById(R.id.delete_bt);
             rowView.setTag(viewHolder);
         } else viewHolder = (ViewHolder) rowView.getTag();
@@ -45,11 +45,8 @@ public class CustomRecipeAdapter extends ArrayAdapter<Recipe> {
         viewHolder.text.setText(recipe.getName());
         Bundle bundle = new Bundle();
         bundle.putInt("id", recipe.getId());
-        viewHolder.btn.setOnClickListener(v -> ((AppCompatActivity) getContext()).getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment_container_view, RecipeFragment.class, bundle)
-                .setReorderingAllowed(true)
-                .addToBackStack("home") // name can be null
-                .commit());
+        viewHolder.btn.setOnClickListener(v ->Navigation.findNavController(v).navigate(
+                R.id.action_navigation_recipe_list_to_navigation_show_recipe, bundle));
         return rowView;
     }
 }

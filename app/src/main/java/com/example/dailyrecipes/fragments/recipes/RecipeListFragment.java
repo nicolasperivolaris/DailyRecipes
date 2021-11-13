@@ -1,4 +1,4 @@
-package com.example.dailyrecipes.fragments.recipelist;
+package com.example.dailyrecipes.fragments.recipes;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -15,11 +15,11 @@ import android.widget.ImageView;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.example.dailyrecipes.R;
-import com.example.dailyrecipes.fragments.RecipeFragment;
 import com.example.dailyrecipes.model.Recipe;
-import com.example.dailyrecipes.queries.RecipeListQuery;
+import com.example.dailyrecipes.queries.recipes.RecipeListQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
 
 import java.util.List;
@@ -33,9 +33,13 @@ public class RecipeListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_recipe_list, container, false);
 
         connection = new ViewModelProvider(requireActivity()).get(ConnectionManager.class);
-        RecipeListQuery recipeListQuery = new RecipeListQuery((res) -> setRecipeList(res));
+        RecipeListQuery recipeListQuery = new RecipeListQuery(this::setRecipeList);
         connection.make(recipeListQuery);
-
+        view.findViewById(R.id.add_bt).setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putBoolean("editable", true);
+            Navigation.findNavController(v).navigate(R.id.action_navigation_recipe_list_to_navigation_show_recipe, bundle);
+        });
         return view;
     }
 
@@ -49,16 +53,11 @@ public class RecipeListFragment extends Fragment {
             recipesLV.setOnItemClickListener((parent, v, position, id) -> {
                         Bundle bundle = new Bundle();
                         bundle.putParcelable("recipe", finalRecipes[position]);
-                        RecipeFragment fragment = new RecipeFragment();
-                        fragment.setArguments(bundle);
-                        getParentFragmentManager().beginTransaction()
-                                .detach(this)
-                                .add(R.id.fragment_container_view, fragment)
-                                .setReorderingAllowed(true)
-                                .addToBackStack(null)
-                                .commit();
+                        Navigation.findNavController(v).navigate(R.id.action_navigation_recipe_list_to_navigation_show_recipe, bundle);
                     }
             );
+
+
         });
     }
 
@@ -92,7 +91,7 @@ public class RecipeListFragment extends Fragment {
 
             Thread t = new Thread(() -> {
                 Bitmap img = data[position].getImage();
-                Drawable image = img == null ? ResourcesCompat.getDrawable(getResources(), R.drawable.nofile, getActivity().getTheme())
+                Drawable image = img == null ? ResourcesCompat.getDrawable(getResources(), R.drawable.nofile, requireActivity().getTheme())
                         : new BitmapDrawable(getResources(), img);
                 requireActivity().runOnUiThread(() -> imageView.setImageDrawable(image));
             });

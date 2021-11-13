@@ -1,6 +1,7 @@
-package com.example.dailyrecipes.queries;
+package com.example.dailyrecipes.queries.recipes;
 
 import com.example.dailyrecipes.model.Recipe;
+import com.example.dailyrecipes.queries.Query;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,10 +23,6 @@ public class RecipeListQuery extends Query<Void, List<Recipe>> {
             Recipe recipe = Recipe.convertJSON(array.getJSONObject(i));
             list.add(recipe);
         }
-
-
-        //for(int i = 1; i<rawData.size(); i+=3) //reject id's
-        //    list.add(new Recipe(Integer.parseInt(rawData.get(i)), rawData.get(i+1), null, rawData.get(i+2)));
         return list;
     }
 

@@ -3,6 +3,8 @@ package com.example.dailyrecipes.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,8 +13,9 @@ public class Ingredient implements Parcelable {
     private String name;
     private Unit unit;
     private float quantity;
+    public static final Ingredient EMPTY = new Ingredient(0, "", new Unit(0, "",""), 0);
 
-    public Ingredient(int id, String name, Unit unit, float quantity) {
+    private Ingredient(int id, String name, Unit unit, float quantity) {
         this.id = id;
         this.name = name;
         this.unit = unit;
@@ -85,6 +88,12 @@ public class Ingredient implements Parcelable {
         result.accumulate("Quantity", quantity);
         result.accumulate("Unit", unit.convertToJSON());
         return result;
+    }
+
+    @NonNull
+    public Object clone(){
+        Ingredient i = new Ingredient(id, name, unit, quantity);
+        return i;
     }
 
     @Override

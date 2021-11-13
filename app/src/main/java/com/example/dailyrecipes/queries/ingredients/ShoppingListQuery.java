@@ -1,12 +1,13 @@
-package com.example.dailyrecipes.queries;
+package com.example.dailyrecipes.queries.ingredients;
 
 import com.example.dailyrecipes.model.Ingredient;
+import com.example.dailyrecipes.queries.Query;
 
 import org.json.JSONException;
 
 import java.util.List;
 
-public class ShoppingListQuery extends Query<Void, List<Ingredient>>{
+public class ShoppingListQuery extends Query<Void, List<Ingredient>> {
     protected ShoppingListQuery(QueryListener<List<Ingredient>> callback) {
         super(callback);
     }

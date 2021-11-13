@@ -1,4 +1,4 @@
-package com.example.dailyrecipes.fragments;
+package com.example.dailyrecipes.fragments.ingredients;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;

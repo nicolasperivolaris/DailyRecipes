@@ -1,4 +1,4 @@
-package com.example.dailyrecipes.fragments;
+package com.example.dailyrecipes.fragments.ingredients;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -17,7 +17,6 @@ import com.example.dailyrecipes.model.Ingredient;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * A fragment representing a list of Items.

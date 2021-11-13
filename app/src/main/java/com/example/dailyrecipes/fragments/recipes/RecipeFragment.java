@@ -1,4 +1,4 @@
-package com.example.dailyrecipes.fragments;
+package com.example.dailyrecipes.fragments.recipes;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,10 +14,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.dailyrecipes.R;
 import com.example.dailyrecipes.model.Recipe;
-import com.example.dailyrecipes.queries.RecipeIngredientsQuery;
-import com.example.dailyrecipes.queries.SaveRecipeQuery;
+import com.example.dailyrecipes.queries.ingredients.RecipeIngredientsQuery;
+import com.example.dailyrecipes.queries.recipes.SaveRecipeQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
-import com.example.dailyrecipes.utils.IngredientsAdapter;
+import com.example.dailyrecipes.fragments.ingredients.IngredientsAdapter;
 
 public class RecipeFragment extends Fragment {
     private ConnectionManager connection;
@@ -29,26 +29,35 @@ public class RecipeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.show_recipe, container, false);
         connection = new ViewModelProvider(requireActivity()).get(ConnectionManager.class);
-        recipe = (Recipe) getArguments().get("recipe");
-        RecipeIngredientsQuery recipeIngredientsQuery = new RecipeIngredientsQuery(recipe, (res) -> setRecipe(res));
-        connection.make(recipeIngredientsQuery);
-
         initSpinner(view);
         initEditMode(view);
         initSaveTransaction(view);
 
+        if(getArguments() != null) {
+            if (getArguments().containsKey("recipe")) {
+                recipe = (Recipe) getArguments().get("recipe");
+                connection.make(new RecipeIngredientsQuery(recipe, (res) -> setRecipe(view, res)));
+            }
+            else {
+                recipe = new Recipe();
+                setRecipe(view, recipe);
+            }
+
+            if(getArguments().containsKey("editable"))
+                ((SwitchCompat) view.findViewById(R.id.edit_sw)).setChecked(getArguments().getBoolean("editable"));
+        }
         return view;
     }
 
     private void initSaveTransaction(View view) {
         view.findViewById(R.id.save_bt).setOnClickListener(v -> {
-            SaveRecipeQuery query = new SaveRecipeQuery((result) -> savedCallBack(result), recipe);
+            SaveRecipeQuery query = new SaveRecipeQuery(this::savedCallBack, recipe);
             connection.make(query);
+            Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT);
         });
     }
 
-    private void savedCallBack(Object result) {
-        int errorCode = (int) result;
+    private void savedCallBack(Integer errorCode) {
         if (errorCode != 0) Toast.makeText(getContext(), "Error while saving", Toast.LENGTH_LONG);
         else Toast.makeText(getContext(), "Saved", Toast.LENGTH_LONG);
     }
@@ -57,7 +66,10 @@ public class RecipeFragment extends Fragment {
         view.findViewById(R.id.add_bt).setOnClickListener(v -> ingredientsAdapter.addRow());
         ((SwitchCompat) view.findViewById(R.id.edit_sw)).setOnCheckedChangeListener((buttonView, isChecked) -> {
             ingredientsAdapter.setEditable(isChecked);
-            view.findViewById(R.id.recipeName_tv).setFocusable(false);
+            view.findViewById(R.id.recipeName_tv).setFocusable(isChecked);
+            view.findViewById(R.id.recipeName_tv).setFocusableInTouchMode(isChecked);
+            view.findViewById(R.id.description_tv).setFocusable(isChecked);
+            view.findViewById(R.id.description_tv).setFocusableInTouchMode(isChecked);
             view.findViewById(R.id.add_bt).setEnabled(isChecked);
             view.findViewById(R.id.save_bt).setEnabled(isChecked);
         });
@@ -77,15 +89,14 @@ public class RecipeFragment extends Fragment {
         });
     }
 
-    private void setRecipe(Object result) {
-        Recipe recipe = (Recipe) result;
-        multiplier = recipe.getMultiplier();
+    private void setRecipe(View view, Recipe result) {
+        multiplier = result.getMultiplier();
 
         getActivity().runOnUiThread(() -> {
-            ((TextView) getActivity().findViewById(R.id.recipeName_tv)).setText(recipe.getName());
-            ingredientsAdapter = new IngredientsAdapter(getContext(), recipe.getIngredients(), multiplier);
+            ((TextView) view.findViewById(R.id.recipeName_tv)).setText(result.getName());
+            ingredientsAdapter = new IngredientsAdapter(getContext(), result.getIngredients(), multiplier);
 
-            ListView list = getActivity().findViewById(R.id.items_list);
+            ListView list = view.findViewById(R.id.ingredients_list);
             list.setAdapter(ingredientsAdapter);
         });
     }
