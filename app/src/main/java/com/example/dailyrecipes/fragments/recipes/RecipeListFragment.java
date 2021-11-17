@@ -11,30 +11,31 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
+import com.example.dailyrecipes.MainActivity;
 import com.example.dailyrecipes.R;
 import com.example.dailyrecipes.model.Recipe;
-import com.example.dailyrecipes.queries.recipes.RecipeListQuery;
-import com.example.dailyrecipes.utils.ConnectionManager;
+import com.example.dailyrecipes.model.RecipesFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecipeListFragment extends Fragment {
-    ConnectionManager connection;
     private final static String TAG = "HomeFragment";
+    private View view;
+    private LayoutInflater inflater;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_recipe_list, container, false);
+        view = inflater.inflate(R.layout.fragment_recipe_list, container, false);
+        this.inflater = inflater;
+        RecipesFactory.instance.addObserver((o, arg) -> setRecipeList((List<Recipe>) arg));
 
-        connection = new ViewModelProvider(requireActivity()).get(ConnectionManager.class);
-        RecipeListQuery recipeListQuery = new RecipeListQuery(this::setRecipeList);
-        connection.make(recipeListQuery);
         view.findViewById(R.id.add_bt).setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putBoolean("editable", true);
@@ -43,30 +44,29 @@ public class RecipeListFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        RecipesFactory factory = RecipesFactory.instance;
+        factory.update();
+        setRecipeList(factory.getDataList());
+    }
+
     private void setRecipeList(List<Recipe> recipeList) {
-        requireActivity().runOnUiThread(() -> {
-            Recipe[] recipes = new Recipe[recipeList.size()];
-            recipes = recipeList.toArray(recipes);
-            GridView recipesLV = requireActivity().findViewById(R.id.recipe_list);
-            recipesLV.setAdapter(new ImageAdapter(requireActivity(), recipes));
-            Recipe[] finalRecipes = recipes;
-            recipesLV.setOnItemClickListener((parent, v, position, id) -> {
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable("recipe", finalRecipes[position]);
-                        Navigation.findNavController(v).navigate(R.id.action_navigation_recipe_list_to_navigation_show_recipe, bundle);
-                    }
-            );
-
-
+        if(recipeList == null) recipeList = new ArrayList<>();
+        List<Recipe> finalRecipeList = recipeList;
+        MainActivity.instance.runOnUiThread(() -> {
+            Recipe[] recipes = new Recipe[finalRecipeList.size()];
+            recipes = finalRecipeList.toArray(recipes);
+            GridView recipesLV = view.findViewById(R.id.recipe_list);
+            recipesLV.setAdapter(new RecipeListAdapter(recipes));
         });
     }
 
-    class ImageAdapter extends BaseAdapter {
-        private final Context mContext;
+    class RecipeListAdapter extends BaseAdapter {
         private final Recipe[] data;
 
-        public ImageAdapter(Context c, Recipe[] data) {
-            mContext = c;
+        public RecipeListAdapter(Recipe[] data) {
             this.data = data;
         }
 
@@ -84,20 +84,28 @@ public class RecipeListFragment extends Fragment {
 
         // create a new ImageView for each item referenced by the Adapter
         public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(200, 200));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(8, 8, 8, 8);
+            View item = inflater.inflate(R.layout.recipe_item_list, parent, false);
+            item.setPadding(8, 8, 8, 8);
 
             Thread t = new Thread(() -> {
-                Bitmap img = data[position].getImage();
+                Recipe recipe = data[position];
+                Bitmap img = recipe.getImage();
                 Drawable image = img == null ? ResourcesCompat.getDrawable(getResources(), R.drawable.nofile, requireActivity().getTheme())
                         : new BitmapDrawable(getResources(), img);
-                requireActivity().runOnUiThread(() -> imageView.setImageDrawable(image));
+                requireActivity().runOnUiThread(() -> {
+                    ((ImageView)item.findViewById(R.id.recipe_img)).setImageDrawable(image);
+                    ((TextView)item.findViewById(R.id.name_tv)).setText(recipe.getName());
+                    item.findViewById(R.id.recipe_img).setOnClickListener(v -> {
+                        Bundle bundle = new Bundle();
+                        bundle.putParcelable("recipe", data[position]);
+                        bundle.putBoolean("editable", false);
+                        Navigation.findNavController(v).navigate(R.id.action_navigation_recipe_list_to_navigation_show_recipe, bundle);
+                    });
+                });
             });
             t.start();
 
-            return imageView;
+            return item;
         }
     }
 }

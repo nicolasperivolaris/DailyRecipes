@@ -6,6 +6,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.example.dailyrecipes.utils.JSONable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,7 +19,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Recipe implements Parcelable {
+public class Recipe implements Parcelable, JSONable<Recipe> {
     private int id;
     private String name;
     private String description;
@@ -25,11 +27,11 @@ public class Recipe implements Parcelable {
     private int multiplier = 1;
     private String imageName;
 
-    public Recipe(){
+    Recipe(){
         ingredients = new ArrayList<>();
     }
 
-    public Recipe(int id, String name, String description, List<Ingredient> ingredients, int multiplier, String imageName) {
+    Recipe(int id, String name, String description, List<Ingredient> ingredients, int multiplier, String imageName) {
         this.id = id;
         this.name = name;
         this.ingredients = ingredients;
@@ -65,21 +67,7 @@ public class Recipe implements Parcelable {
         }
     };
 
-    public static Recipe convertJSON(JSONObject jsonObject) throws JSONException {
-        int id = jsonObject.getInt("Id");
-        String name = jsonObject.getString("Name");
-        String description = jsonObject.getString("Description");
-        int multiplier = jsonObject.getInt("Multiplier");
-        String imageName = jsonObject.getString("ImagePath");
-        ArrayList<Ingredient> ingredients = new ArrayList<>();
-        if (!jsonObject.isNull("Ingredients")){
-            JSONArray array = jsonObject.getJSONArray("Ingredients");
-            for (int i = 0; i < array.length(); i++)
-                ingredients.add(Ingredient.convertJSON(array.getJSONObject(i)));
-        }
-        return new Recipe(id, name,description, ingredients,multiplier, imageName);
-    }
-
+    @Override
     public JSONObject convertToJSON() throws JSONException {
         JSONObject result = new JSONObject();
         result.accumulate("Id", id);

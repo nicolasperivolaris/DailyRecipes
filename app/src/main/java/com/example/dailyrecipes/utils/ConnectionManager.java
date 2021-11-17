@@ -18,6 +18,7 @@ public class ConnectionManager extends ViewModel {
     private Socket socket;
     private BufferedReader input;
     private PrintWriter output;
+    private boolean sending;
     private final Hashtable<Integer, Query<?, ?>> queries;
 
     public ConnectionManager() {
@@ -31,7 +32,8 @@ public class ConnectionManager extends ViewModel {
                 socket = new Socket(ip, port);
                 input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 output = new PrintWriter(socket.getOutputStream());
-                while (socket.isConnected()) {
+                sending=false;
+                while (socket.isConnected() && !socket.isClosed()) {
                     try {
                         formatResponse();
                     } catch (IOException e) {
@@ -64,8 +66,10 @@ public class ConnectionManager extends ViewModel {
         Thread t = new Thread(() -> {
             boolean done = false;
             while (!done) {
-                if (socket.isConnected()) {
+                if (socket.isConnected() && !sending) {
+                    sending = true;
                     query.print(output);
+                    sending = false;
                     done = true;
                 }
                 try {

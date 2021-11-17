@@ -14,18 +14,13 @@ public class SaveRecipeQuery extends Query<List<Ingredient>, Integer> {
     private final Recipe recipe;
 
     public SaveRecipeQuery(QueryListener<Integer> callback, Recipe recipe) {
-        super(callback);
+        super(callback, Flag.SAVE_RECIPE);
         this.recipe = recipe;
     }
 
     @Override
     protected Integer formatData(String json) {
         return 0;
-    }
-
-    @Override
-    public int getFlag() {
-        return SAVE_RECIPE;
     }
 
     @Override
@@ -36,6 +31,6 @@ public class SaveRecipeQuery extends Query<List<Ingredient>, Integer> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return null;
+        return "java error";
     }
 }

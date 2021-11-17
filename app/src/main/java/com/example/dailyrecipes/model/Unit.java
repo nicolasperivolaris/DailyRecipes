@@ -3,15 +3,17 @@ package com.example.dailyrecipes.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.example.dailyrecipes.utils.JSONable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Unit implements Parcelable {
+public class Unit implements Parcelable, JSONable<Unit> {
     private int id;
     private String name;
     private String symbol;
 
-    public Unit(int id, String name, String symbol) {
+    Unit(int id, String name, String symbol) {
         this.id = id;
         this.name = name;
         this.symbol = symbol;
@@ -34,13 +36,6 @@ public class Unit implements Parcelable {
             return new Unit[size];
         }
     };
-
-    public static Unit convertJSON(JSONObject jsonObject) throws JSONException {
-        int id = jsonObject.getInt("Id");
-        String name = jsonObject.getString("Name");
-        String symbol = jsonObject.getString("Symbol");
-        return new Unit(id, name, symbol);
-    }
 
     public int getId() {
         return id;
@@ -66,7 +61,8 @@ public class Unit implements Parcelable {
         this.symbol = symbol;
     }
 
-    public Object convertToJSON() throws JSONException {
+    @Override
+    public JSONObject convertToJSON() throws JSONException {
         JSONObject result = new JSONObject();
         result.accumulate("Id", id);
         result.accumulate("Name", name);

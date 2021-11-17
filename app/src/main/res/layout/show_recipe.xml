@@ -22,7 +22,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <EditText
-            android:id="@+id/recipeName_tv"
+            android:id="@+id/recipeName_et"
             style="@style/Widget.AppCompat.EditText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
             android:contentDescription="@string/image_of_the_recipe"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/edit_sw"
-            app:layout_constraintStart_toEndOf="@+id/recipeName_tv"
+            app:layout_constraintStart_toEndOf="@+id/recipeName_et"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/nofile" />
 
@@ -149,7 +149,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:labelFor="@id/description_tv"
+            android:labelFor="@id/description_et"
             android:text="@string/description"
             android:textColor="@color/black"
             android:textSize="20sp"
@@ -158,7 +158,7 @@
             app:layout_constraintTop_toBottomOf="@+id/frameLayout" />
 
         <EditText
-            android:id="@+id/description_tv"
+            android:id="@+id/description_et"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:autofillHints="description"

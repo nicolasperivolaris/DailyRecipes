@@ -1,27 +1,26 @@
 package com.example.dailyrecipes.queries;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 
 import java.io.PrintWriter;
 
 public abstract class Query<Param, Result> {
-    public static final int GET_RECIPE_LIST = 0;
-    public static final int GET_RECIPE_INGREDIENTS = 1;
-    public static final int ADD_INGREDIENT = 2;
-    public static final int DELETE_INGREDIENT = 3;
-    public static final int GET_SHOPPING_LIST = 4;
-    public static final int SAVE_RECIPE = 5;
-    public static final int GET_INGREDIENT_LIST = 6;
 
     private static int currentId = 0;
     public final int id;
     private final QueryListener listener;
     private Param param;
     private Result dataSet;
+    protected Flag flag;
 
-    protected Query(QueryListener callback) {
+    private Query(QueryListener callback) {
         id = getNewId();
         this.listener = callback;
+    }
+    protected Query(QueryListener callback, Flag flag) {
+        this(callback);
+        this.flag = flag;
     }
 
     public Result getData() {
@@ -58,12 +57,15 @@ public abstract class Query<Param, Result> {
      */
     protected abstract Result formatData(String JSON) throws JSONException;
 
-    public abstract int getFlag();
+    public Flag getFlag(){
+        return flag;
+    }
 
     /**
      * Parameter of the request
      * @return
      */
+    @NotNull
     public abstract String getArg();
 
     protected void printData(String s, PrintWriter out) {
@@ -81,7 +83,7 @@ public abstract class Query<Param, Result> {
 
     public void print(PrintWriter out) {
         out.print(id + "\t");
-        out.print(getFlag() + "\t");
+        out.print(getFlag().id + "\t");
         out.print(getArg() + "\n");
         out.flush();
     }
@@ -92,5 +94,31 @@ public abstract class Query<Param, Result> {
 
     public interface QueryListener<Result> {
         void dataReceived(Result result);
+    }
+
+    public enum Flag{
+        GET_RECIPE_LIST(0),
+        GET_RECIPE_INGREDIENTS(1),
+        ADD_INGREDIENT(2),
+        DELETE_INGREDIENT(3),
+        GET_SHOPPING_LIST(4),
+        SAVE_RECIPE(5),
+        GET_INGREDIENT_LIST(6),
+        GET_UNIT_LIST(7);
+        public final int id;
+        Flag(int i){
+            id = i;
+        }
+        public Flag getEnum(int i){
+            for (Flag f : values()) {
+                if(f.id == i)
+                    return f;
+            }
+            return null;
+        }
+
+        public int getValue(){
+            return id;
+        }
     }
 }

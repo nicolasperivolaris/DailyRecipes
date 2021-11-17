@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ShoppingListQuery extends Query<Void, List<Ingredient>> {
     protected ShoppingListQuery(QueryListener<List<Ingredient>> callback) {
-        super(callback);
+        super(callback,Flag.GET_SHOPPING_LIST);
     }
 
     @Override
@@ -18,12 +18,7 @@ public class ShoppingListQuery extends Query<Void, List<Ingredient>> {
     }
 
     @Override
-    public int getFlag() {
-        return GET_SHOPPING_LIST;
-    }
-
-    @Override
     public String getArg() {
-        return null;
+        return "ShoppingList";
     }
 }

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.dailyrecipes.R;
 import com.example.dailyrecipes.model.Recipe;
+import com.example.dailyrecipes.model.RecipesFactory;
 import com.example.dailyrecipes.queries.ingredients.RecipeIngredientsQuery;
 import com.example.dailyrecipes.queries.recipes.SaveRecipeQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
@@ -31,7 +33,7 @@ public class RecipeFragment extends Fragment {
         connection = new ViewModelProvider(requireActivity()).get(ConnectionManager.class);
         initSpinner(view);
         initEditMode(view);
-        initSaveTransaction(view);
+        initSaveButton(view);
 
         if(getArguments() != null) {
             if (getArguments().containsKey("recipe")) {
@@ -39,18 +41,29 @@ public class RecipeFragment extends Fragment {
                 connection.make(new RecipeIngredientsQuery(recipe, (res) -> setRecipe(view, res)));
             }
             else {
-                recipe = new Recipe();
+                recipe = RecipesFactory.instance.newInstance();
                 setRecipe(view, recipe);
             }
 
             if(getArguments().containsKey("editable"))
                 ((SwitchCompat) view.findViewById(R.id.edit_sw)).setChecked(getArguments().getBoolean("editable"));
+            else
+                ((SwitchCompat) view.findViewById(R.id.edit_sw)).setChecked(false);
+        }else {
+            view.findViewById(R.id.recipeName_et).setFocusable(false);
+            view.findViewById(R.id.recipeName_et).setFocusableInTouchMode(false);
+            view.findViewById(R.id.description_et).setFocusable(false);
+            view.findViewById(R.id.description_et).setFocusableInTouchMode(false);
         }
+
         return view;
     }
 
-    private void initSaveTransaction(View view) {
+    private void initSaveButton(View view) {
         view.findViewById(R.id.save_bt).setOnClickListener(v -> {
+            recipe.setName(((EditText)view.findViewById(R.id.recipeName_et)).getText().toString());
+            recipe.setDescription(((EditText)view.findViewById(R.id.description_et)).getText().toString());
+            recipe.setMultiplier(Integer.parseInt(((TextView)view.findViewById(R.id.amount_tv)).getText().toString()));
             SaveRecipeQuery query = new SaveRecipeQuery(this::savedCallBack, recipe);
             connection.make(query);
             Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT);
@@ -58,18 +71,20 @@ public class RecipeFragment extends Fragment {
     }
 
     private void savedCallBack(Integer errorCode) {
-        if (errorCode != 0) Toast.makeText(getContext(), "Error while saving", Toast.LENGTH_LONG);
-        else Toast.makeText(getContext(), "Saved", Toast.LENGTH_LONG);
+        requireActivity().runOnUiThread(() -> {
+            if (errorCode != 0) Toast.makeText(getContext(), "Error while saving", Toast.LENGTH_LONG);
+            else Toast.makeText(getContext(), "Saved", Toast.LENGTH_LONG);
+        });
     }
 
     private void initEditMode(View view) {
         view.findViewById(R.id.add_bt).setOnClickListener(v -> ingredientsAdapter.addRow());
         ((SwitchCompat) view.findViewById(R.id.edit_sw)).setOnCheckedChangeListener((buttonView, isChecked) -> {
             ingredientsAdapter.setEditable(isChecked);
-            view.findViewById(R.id.recipeName_tv).setFocusable(isChecked);
-            view.findViewById(R.id.recipeName_tv).setFocusableInTouchMode(isChecked);
-            view.findViewById(R.id.description_tv).setFocusable(isChecked);
-            view.findViewById(R.id.description_tv).setFocusableInTouchMode(isChecked);
+            view.findViewById(R.id.recipeName_et).setFocusable(isChecked);
+            view.findViewById(R.id.recipeName_et).setFocusableInTouchMode(isChecked);
+            view.findViewById(R.id.description_et).setFocusable(isChecked);
+            view.findViewById(R.id.description_et).setFocusableInTouchMode(isChecked);
             view.findViewById(R.id.add_bt).setEnabled(isChecked);
             view.findViewById(R.id.save_bt).setEnabled(isChecked);
         });
@@ -93,7 +108,8 @@ public class RecipeFragment extends Fragment {
         multiplier = result.getMultiplier();
 
         getActivity().runOnUiThread(() -> {
-            ((TextView) view.findViewById(R.id.recipeName_tv)).setText(result.getName());
+            ((EditText) view.findViewById(R.id.recipeName_et)).setText(result.getName());
+            ((EditText) view.findViewById(R.id.description_et)).setText(result.getDescription());
             ingredientsAdapter = new IngredientsAdapter(getContext(), result.getIngredients(), multiplier);
 
             ListView list = view.findViewById(R.id.ingredients_list);

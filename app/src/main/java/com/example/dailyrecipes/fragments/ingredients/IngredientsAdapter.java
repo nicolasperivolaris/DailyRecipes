@@ -5,12 +5,17 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.dailyrecipes.R;
 import com.example.dailyrecipes.model.Ingredient;
 import com.example.dailyrecipes.model.IngredientsFactory;
+import com.example.dailyrecipes.model.Unit;
+import com.example.dailyrecipes.model.UnitsFactory;
 
 import java.util.List;
 
@@ -67,21 +72,31 @@ public class IngredientsAdapter extends BaseAdapter {
         });
 
         view.findViewById(R.id.choice).setOnClickListener(v->{
-            createDialogList(position);
+            createIngredientsDialogList(position);
+        });
+        view.findViewById(R.id.unit_et).setOnClickListener(v->{
+            createUnitsDialogList(position);
         });
 
-        //((TextView) view.findViewById(R.id.unit_tv));
+        ((EditText)view.findViewById(R.id.quantity_et)).setOnFocusChangeListener((v, hasFocus) -> {
+            try {
+                if (!hasFocus)
+                    ingredientList.get(position).setQuantity(Float.parseFloat(String.valueOf(((EditText) v).getText()))/multiplier);
+            }catch (NumberFormatException e){
+                e.printStackTrace();
+            }
+        });
 
         Ingredient ingredient = ingredientList.get(position);
         ((TextView) view.findViewById(R.id.choice)).setText(ingredient.getName());
-        ((TextView) view.findViewById(R.id.quantity_tv)).setText(Float.toString(ingredient.getQuantity() * multiplier));
-        ((TextView) view.findViewById(R.id.unit_tv)).setText(ingredient.getUnit().getName());
+        ((EditText) view.findViewById(R.id.quantity_et)).setText(Float.toString(ingredient.getQuantity() * multiplier));
+        ((TextView) view.findViewById(R.id.unit_et)).setText(ingredient.getUnit().getSymbol());
 
         view.findViewById(R.id.choice).setEnabled(editable);
-        view.findViewById(R.id.quantity_tv).setFocusable(editable);
-        view.findViewById(R.id.unit_tv).setFocusable(editable);
-        view.findViewById(R.id.quantity_tv).setFocusableInTouchMode(editable);
-        view.findViewById(R.id.unit_tv).setFocusableInTouchMode(editable);
+        view.findViewById(R.id.quantity_et).setFocusable(editable);
+        view.findViewById(R.id.quantity_et).setFocusableInTouchMode(editable);
+        view.findViewById(R.id.unit_et).setClickable(editable);
+        view.findViewById(R.id.unit_et).setFocusable(editable);
         view.findViewById(R.id.delete_bt).setEnabled(editable);
 
         return view;
@@ -93,19 +108,37 @@ public class IngredientsAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    private void createDialogList(int position){
+    private void createIngredientsDialogList(int position){
         AlertDialog.Builder builder = new AlertDialog.Builder(inflater.getContext());
         builder.setTitle("Choose an ingredient");
 
-        List<Ingredient> allIngredients = IngredientsFactory.GetIngredientList();
+        List<Ingredient> allIngredients = IngredientsFactory.instance.getDataList();
         if(allIngredients.size() >0 )
-            builder.setItems(IngredientsFactory.GetIngredientsNames(), (dialog, i) -> {
+            builder.setItems(IngredientsFactory.instance.getNames(), (dialog, i) -> {
                 ingredientList.remove(position);
                 ingredientList.add(position, allIngredients.get(i));
                 notifyDataSetChanged();
             });
 
         builder.setNeutralButton("Create new ingredient",(dialog, which) -> {
+
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void createUnitsDialogList(int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(inflater.getContext());
+        builder.setTitle("Choose an unit");
+
+        List<Unit> allUnit = UnitsFactory.instance.getDataList();
+        if(allUnit.size() >0 )
+            builder.setItems(UnitsFactory.instance.getNames(), (dialog, i) -> {
+                ingredientList.get(position).setUnit(UnitsFactory.instance.getDataList().get(i));
+                notifyDataSetChanged();
+            });
+
+        builder.setNeutralButton("Create new unit",(dialog, which) -> {
 
         });
         AlertDialog dialog = builder.create();

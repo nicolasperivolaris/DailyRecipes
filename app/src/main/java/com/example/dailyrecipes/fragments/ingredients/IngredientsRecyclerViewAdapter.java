@@ -52,7 +52,7 @@ public class IngredientsRecyclerViewAdapter extends RecyclerView.Adapter<Ingredi
             super(binding.getRoot());
             mIdView = binding.itemNumber;
             mNameView = binding.nameTv;
-            mQuantityView = binding.quantityTv;
+            mQuantityView = binding.quantityEt;
         }
 
         @Override

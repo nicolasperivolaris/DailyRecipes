@@ -1,5 +1,6 @@
 package com.example.dailyrecipes;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +12,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.dailyrecipes.model.Ingredient;
 import com.example.dailyrecipes.model.IngredientsFactory;
+import com.example.dailyrecipes.model.RecipesFactory;
+import com.example.dailyrecipes.model.UnitsFactory;
 import com.example.dailyrecipes.utils.ConnectionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -19,10 +22,12 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     public List<Ingredient> shoppingList;
+    public static Activity instance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        instance = this;
         shoppingList = getShoppingList();
         setContentView(R.layout.activity_main);
 
@@ -39,12 +44,20 @@ public class MainActivity extends AppCompatActivity {
 
         ConnectionManager connection = new ViewModelProvider(this).get(ConnectionManager.class);
         connection.connect("192.168.2.1", 5500);
-        IngredientsFactory.ConnectIngredientsFactory(connection);
+        RecipesFactory.instance.ConnectFactory(connection);
+        IngredientsFactory.instance.ConnectFactory(connection);
+        UnitsFactory.instance.ConnectFactory(connection);
     }
 
     private List<Ingredient> getShoppingList() {
         List<Ingredient> list = new ArrayList<>();
 //todo
         return list;
+    }
+
+    @Override
+    public boolean onSupportNavigateUp(){
+        NavController navController =  ((NavHostFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_container_view)).getNavController();
+        return navController.navigateUp() || super.onSupportNavigateUp();
     }
 }

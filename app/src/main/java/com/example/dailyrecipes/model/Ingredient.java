@@ -5,17 +5,19 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import com.example.dailyrecipes.utils.JSONable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Ingredient implements Parcelable {
+public class Ingredient implements Parcelable, JSONable<Ingredient> {
     private int id;
     private String name;
     private Unit unit;
     private float quantity;
     public static final Ingredient EMPTY = new Ingredient(0, "", new Unit(0, "",""), 0);
 
-    private Ingredient(int id, String name, Unit unit, float quantity) {
+    Ingredient(int id, String name, Unit unit, float quantity) {
         this.id = id;
         this.name = name;
         this.unit = unit;
@@ -73,14 +75,9 @@ public class Ingredient implements Parcelable {
         this.id = id;
     }
 
-    public static Ingredient convertJSON(JSONObject jsonObject) throws JSONException {
-        int id = jsonObject.getInt("Id");
-        String name = jsonObject.getString("Name");
-        float quantity = (float) jsonObject.getDouble("Quantity");
-        Unit unit = Unit.convertJSON(jsonObject.getJSONObject("Unit"));
-        return new Ingredient(id, name, unit, quantity);
-    }
 
+
+    @Override
     public JSONObject convertToJSON() throws JSONException {
         JSONObject result = new JSONObject();
         result.accumulate("Id", id);

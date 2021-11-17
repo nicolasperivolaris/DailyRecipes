@@ -6,25 +6,29 @@
     android:layout_height="match_parent">
 
 
-    <TextView
-        android:id="@+id/quantity_tv"
+    <EditText
+        android:id="@+id/quantity_et"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/quantity"
+        android:inputType="number"
+        android:minHeight="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/unit_tv"
+        app:layout_constraintStart_toEndOf="@+id/choice"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <AutoCompleteTextView
-        android:id="@+id/unit_tv"
+    <TextView
+        android:id="@+id/unit_et"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:hint="@string/unit"
         android:minWidth="48dp"
         android:minHeight="48dp"
+        android:textSize="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/delete_bt"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintStart_toEndOf="@+id/quantity_et"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/choice"
