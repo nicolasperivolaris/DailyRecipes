@@ -1,26 +1,22 @@
 package com.example.dailyrecipes.model;
 
-import android.app.Activity;
-
-import androidx.annotation.UiThread;
-
 import com.example.dailyrecipes.queries.Query;
 import com.example.dailyrecipes.queries.ingredients.AddQuery;
 import com.example.dailyrecipes.queries.ListQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
-import com.example.dailyrecipes.utils.JSONable;
+import com.example.dailyrecipes.utils.PositionedMap;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 
-public abstract class QueryableFactory<T extends JSONable<T>> extends Observable {
+public abstract class QueryableFactory<T extends ItemModel> extends Observable {
     private static ConnectionManager connection;
-    protected List<T> dataList = new ArrayList<>();
+    protected PositionedMap<T> dataList = new PositionedMap<>();
 
     public void ConnectFactory(ConnectionManager connectionManager){
         connection = connectionManager;
@@ -33,16 +29,16 @@ public abstract class QueryableFactory<T extends JSONable<T>> extends Observable
 
     public abstract Query.Flag getFlag();
 
-    public List<T> getDataList(){
-        return Collections.unmodifiableList(dataList);
+    public PositionedMap<T> getDataList(){
+        return dataList;
     }
 
     public abstract String[] getNames();
 
     public abstract T convertJSON(JSONObject jsonObject) throws JSONException;
 
-    private void SetList(List<T> list){
-        dataList = list;
+    private void SetList(Map<Integer, T> list){
+        dataList = new PositionedMap<>(list);
         setChanged();
         notifyObservers(list);
     }

@@ -3,25 +3,19 @@ package com.example.dailyrecipes.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.example.dailyrecipes.utils.JSONable;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Unit implements Parcelable, JSONable<Unit> {
-    private int id;
-    private String name;
+public class Unit extends ItemModel implements Parcelable{
     private String symbol;
 
     Unit(int id, String name, String symbol) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.symbol = symbol;
     }
 
     protected Unit(Parcel in) {
-        id = in.readInt();
-        name = in.readString();
+        super(in.readInt(),in.readString());
         symbol = in.readString();
     }
 
@@ -36,22 +30,6 @@ public class Unit implements Parcelable, JSONable<Unit> {
             return new Unit[size];
         }
     };
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getSymbol() {
         return symbol;

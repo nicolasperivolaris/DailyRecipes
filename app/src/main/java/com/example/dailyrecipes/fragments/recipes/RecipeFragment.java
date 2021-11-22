@@ -14,12 +14,18 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.dailyrecipes.R;
+import com.example.dailyrecipes.model.Ingredient;
 import com.example.dailyrecipes.model.Recipe;
 import com.example.dailyrecipes.model.RecipesFactory;
+import com.example.dailyrecipes.model.Unit;
+import com.example.dailyrecipes.model.UnitsFactory;
 import com.example.dailyrecipes.queries.ingredients.RecipeIngredientsQuery;
 import com.example.dailyrecipes.queries.recipes.SaveRecipeQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
 import com.example.dailyrecipes.fragments.ingredients.IngredientsAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RecipeFragment extends Fragment {
     private ConnectionManager connection;
@@ -110,6 +116,11 @@ public class RecipeFragment extends Fragment {
         getActivity().runOnUiThread(() -> {
             ((EditText) view.findViewById(R.id.recipeName_et)).setText(result.getName());
             ((EditText) view.findViewById(R.id.description_et)).setText(result.getDescription());
+
+            for (Ingredient i:result.getIngredients().values()) {
+                i.setUnit(UnitsFactory.instance.getDataList().get((Integer)i.getUnit().getId()));
+            }
+
             ingredientsAdapter = new IngredientsAdapter(getContext(), result.getIngredients(), multiplier);
 
             ListView list = view.findViewById(R.id.ingredients_list);

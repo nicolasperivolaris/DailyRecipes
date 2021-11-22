@@ -20,8 +20,9 @@ public class UnitsFactory extends QueryableFactory<Unit> {
 
     public String[] getNames(){
         String[] UnitsName = new String[dataList.size()];
-        for (int i = 0; i< dataList.size(); i++) {
-            UnitsName[i] = dataList.get(i).getName();
+        int cp = 0;
+        for (Integer i : dataList.ids()) {
+            UnitsName[cp++] = dataList.get(i).getName();
         }
         return UnitsName;
     }

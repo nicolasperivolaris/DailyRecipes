@@ -23,6 +23,9 @@ import com.example.dailyrecipes.model.Recipe;
 import com.example.dailyrecipes.model.RecipesFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class RecipeListFragment extends Fragment {
@@ -34,7 +37,7 @@ public class RecipeListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_recipe_list, container, false);
         this.inflater = inflater;
-        RecipesFactory.instance.addObserver((o, arg) -> setRecipeList((List<Recipe>) arg));
+        RecipesFactory.instance.addObserver((o, arg) -> setRecipeList(((HashMap<Integer, Recipe>) arg).values()));
 
         view.findViewById(R.id.add_bt).setOnClickListener(v -> {
             Bundle bundle = new Bundle();
@@ -49,12 +52,12 @@ public class RecipeListFragment extends Fragment {
         super.onStart();
         RecipesFactory factory = RecipesFactory.instance;
         factory.update();
-        setRecipeList(factory.getDataList());
+        setRecipeList(factory.getDataList().values());
     }
 
-    private void setRecipeList(List<Recipe> recipeList) {
+    private void setRecipeList(Collection<Recipe> recipeList) {
         if(recipeList == null) recipeList = new ArrayList<>();
-        List<Recipe> finalRecipeList = recipeList;
+        Collection<Recipe> finalRecipeList = recipeList;
         MainActivity.instance.runOnUiThread(() -> {
             Recipe[] recipes = new Recipe[finalRecipeList.size()];
             recipes = finalRecipeList.toArray(recipes);

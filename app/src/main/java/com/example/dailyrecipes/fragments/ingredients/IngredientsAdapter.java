@@ -5,8 +5,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -14,24 +12,29 @@ import android.widget.TextView;
 import com.example.dailyrecipes.R;
 import com.example.dailyrecipes.model.Ingredient;
 import com.example.dailyrecipes.model.IngredientsFactory;
+import com.example.dailyrecipes.model.ItemModel;
 import com.example.dailyrecipes.model.Unit;
 import com.example.dailyrecipes.model.UnitsFactory;
+import com.example.dailyrecipes.utils.ItemAdapter;
+import com.example.dailyrecipes.utils.PositionedMap;
 
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 public class IngredientsAdapter extends BaseAdapter {
-    private final List<Ingredient> ingredientList;
-    private final LayoutInflater inflater;
+    private final PositionedMap<Ingredient> ingredientList;
+    private final Context context;
     private int multiplier;
     private boolean editable;
 
-    public IngredientsAdapter(Context context, List<Ingredient> ingredients, int multiplier) {
+    public IngredientsAdapter(Context context, PositionedMap<Ingredient> ingredients, int multiplier) {
         this.ingredientList = ingredients;
-        this.inflater = (LayoutInflater.from(context));
+        this.context = context;
         setMultiplier(multiplier);
     }
 
-    public List<Ingredient> getIngredients() {
+    public PositionedMap<Ingredient> getIngredients() {
         return ingredientList;
     }
 
@@ -64,7 +67,7 @@ public class IngredientsAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View view;
         if (convertView == null)
-            view = inflater.inflate(R.layout.show_delete_ingredient_item_list, parent, false);
+            view = (LayoutInflater.from(context)).inflate(R.layout.show_delete_ingredient_item_list, parent, false);
         else view = convertView;
         view.findViewById(R.id.delete_bt).setOnClickListener(v -> {
             ingredientList.remove(position);
@@ -78,7 +81,7 @@ public class IngredientsAdapter extends BaseAdapter {
             createUnitsDialogList(position);
         });
 
-        ((EditText)view.findViewById(R.id.quantity_et)).setOnFocusChangeListener((v, hasFocus) -> {
+        view.findViewById(R.id.quantity_et).setOnFocusChangeListener((v, hasFocus) -> {
             try {
                 if (!hasFocus)
                     ingredientList.get(position).setQuantity(Float.parseFloat(String.valueOf(((EditText) v).getText()))/multiplier);
@@ -104,22 +107,19 @@ public class IngredientsAdapter extends BaseAdapter {
 
     public void addRow() {
         Ingredient ingredient = (Ingredient) Ingredient.EMPTY.clone();
-        ingredientList.add(ingredient);
+        ingredientList.put(ingredient.getId(),ingredient);
         notifyDataSetChanged();
     }
 
     private void createIngredientsDialogList(int position){
-        AlertDialog.Builder builder = new AlertDialog.Builder(inflater.getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Choose an ingredient");
-
-        List<Ingredient> allIngredients = IngredientsFactory.instance.getDataList();
-        if(allIngredients.size() >0 )
-            builder.setItems(IngredientsFactory.instance.getNames(), (dialog, i) -> {
-                ingredientList.remove(position);
-                ingredientList.add(position, allIngredients.get(i));
-                notifyDataSetChanged();
-            });
-
+        ItemAdapter itemAdapter = new ItemAdapter(IngredientsFactory.instance.getDataList(),context);
+        builder.setAdapter(itemAdapter, (dialog, choice) -> {
+            Ingredient i = IngredientsFactory.instance.getDataList().get(choice);
+            ingredientList.replace(position, i);
+            notifyDataSetChanged();
+        });
         builder.setNeutralButton("Create new ingredient",(dialog, which) -> {
 
         });
@@ -128,20 +128,18 @@ public class IngredientsAdapter extends BaseAdapter {
     }
 
     private void createUnitsDialogList(int position){
-        AlertDialog.Builder builder = new AlertDialog.Builder(inflater.getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Choose an unit");
-
-        List<Unit> allUnit = UnitsFactory.instance.getDataList();
-        if(allUnit.size() >0 )
-            builder.setItems(UnitsFactory.instance.getNames(), (dialog, i) -> {
-                ingredientList.get(position).setUnit(UnitsFactory.instance.getDataList().get(i));
-                notifyDataSetChanged();
-            });
-
+        ItemAdapter itemAdapter = new ItemAdapter(UnitsFactory.instance.getDataList(),context);
+        builder.setAdapter(itemAdapter, (dialog, which) -> {
+            ingredientList.get(position).setUnit((Unit) itemAdapter.getItemByPosition(which));
+            notifyDataSetChanged();
+        });
         builder.setNeutralButton("Create new unit",(dialog, which) -> {
-
         });
         AlertDialog dialog = builder.create();
         dialog.show();
     }
 }
+
+

@@ -5,28 +5,24 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-import com.example.dailyrecipes.utils.JSONable;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Ingredient implements Parcelable, JSONable<Ingredient> {
-    private int id;
-    private String name;
+import java.util.Objects;
+
+public class Ingredient extends ItemModel implements Parcelable{
     private Unit unit;
     private float quantity;
     public static final Ingredient EMPTY = new Ingredient(0, "", new Unit(0, "",""), 0);
 
     Ingredient(int id, String name, Unit unit, float quantity) {
-        this.id = id;
-        this.name = name;
+        super(id, name);
         this.unit = unit;
         this.quantity = quantity;
     }
 
     protected Ingredient(Parcel in) {
-        id = in.readInt();
-        name = in.readString();
+        super(in.readInt(),in.readString());
         unit = in.readParcelable(Unit.class.getClassLoader());
         quantity = in.readFloat();
     }
@@ -43,14 +39,6 @@ public class Ingredient implements Parcelable, JSONable<Ingredient> {
         }
     };
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public Unit getUnit() {
         return unit;
     }
@@ -66,16 +54,6 @@ public class Ingredient implements Parcelable, JSONable<Ingredient> {
     public void setQuantity(float quantity) {
         this.quantity = quantity;
     }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-
 
     @Override
     public JSONObject convertToJSON() throws JSONException {
@@ -104,5 +82,18 @@ public class Ingredient implements Parcelable, JSONable<Ingredient> {
         dest.writeString(name);
         dest.writeParcelable(unit, flags);
         dest.writeFloat(quantity);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ingredient that = (Ingredient) o;
+        return Float.compare(that.quantity, quantity) == 0 && unit.getId() == that.unit.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(unit, quantity);
     }
 }

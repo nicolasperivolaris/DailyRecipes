@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Observer;
 
@@ -38,7 +39,15 @@ public class RecipesFactory extends QueryableFactory<Recipe> {
             for (int i = 0; i < array.length(); i++)
                 ingredients.add(IngredientsFactory.instance.convertJSON(array.getJSONObject(i)));
         }
-        return new Recipe(id, name,description, ingredients,multiplier, imageName);
+
+        DayOfWeek day;
+        JSONObject object = jsonObject.getJSONObject("Day");
+        if(object.getBoolean("Valid"))
+            day = DayOfWeek.of(object.getInt("Int64"));
+        else
+            day = null;
+
+        return new Recipe(id, name,description, ingredients,multiplier, imageName, day);
     }
 
     public Recipe newInstance(){
