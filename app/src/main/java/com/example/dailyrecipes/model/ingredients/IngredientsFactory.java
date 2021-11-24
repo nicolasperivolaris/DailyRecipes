@@ -1,11 +1,14 @@
-package com.example.dailyrecipes.model;
+package com.example.dailyrecipes.model.ingredients;
 
+import com.example.dailyrecipes.model.QueryableFactory;
+import com.example.dailyrecipes.model.unit.Unit;
+import com.example.dailyrecipes.model.unit.UnitsFactory;
 import com.example.dailyrecipes.queries.Query;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class IngredientsFactory extends QueryableFactory<Ingredient>{
+public class IngredientsFactory extends QueryableFactory<Ingredient> {
     public static IngredientsFactory instance = new IngredientsFactory();
 
     @Override

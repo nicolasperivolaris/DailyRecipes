@@ -1,12 +1,10 @@
-package com.example.dailyrecipes.model;
+package com.example.dailyrecipes.model.unit;
 
+import com.example.dailyrecipes.model.QueryableFactory;
 import com.example.dailyrecipes.queries.Query;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Collections;
-import java.util.List;
 
 public class UnitsFactory extends QueryableFactory<Unit> {
 

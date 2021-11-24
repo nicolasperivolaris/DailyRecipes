@@ -1,6 +1,6 @@
 package com.example.dailyrecipes.queries.ingredients;
 
-import com.example.dailyrecipes.model.Ingredient;
+import com.example.dailyrecipes.model.ingredients.Ingredient;
 import com.example.dailyrecipes.queries.Query;
 
 import org.json.JSONException;

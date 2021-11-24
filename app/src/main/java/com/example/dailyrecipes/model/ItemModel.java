@@ -4,21 +4,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public abstract class ItemModel {
-    protected int id;
+    protected Integer id;
     protected String name;
 
-    public ItemModel(int id, String name) {
+    public ItemModel(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
 
     public abstract JSONObject convertToJSON() throws JSONException;
-    public int getId(){
+    public Integer getId(){
         return id;
     }
 
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

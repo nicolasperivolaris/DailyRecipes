@@ -9,33 +9,41 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.LinearLayoutCompat;
+
 import com.example.dailyrecipes.R;
-import com.example.dailyrecipes.model.Ingredient;
-import com.example.dailyrecipes.model.IngredientsFactory;
-import com.example.dailyrecipes.model.ItemModel;
-import com.example.dailyrecipes.model.Unit;
-import com.example.dailyrecipes.model.UnitsFactory;
+import com.example.dailyrecipes.model.ingredients.Ingredient;
+import com.example.dailyrecipes.model.ingredients.IngredientsFactory;
+import com.example.dailyrecipes.model.unit.Unit;
+import com.example.dailyrecipes.model.unit.UnitsFactory;
 import com.example.dailyrecipes.utils.ItemAdapter;
 import com.example.dailyrecipes.utils.PositionedMap;
 
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-
 public class IngredientsAdapter extends BaseAdapter {
     private final PositionedMap<Ingredient> ingredientList;
+    private final LinearLayoutCompat layout;
     private final Context context;
     private int multiplier;
     private boolean editable;
 
-    public IngredientsAdapter(Context context, PositionedMap<Ingredient> ingredients, int multiplier) {
+    public IngredientsAdapter(LinearLayoutCompat list, Context context, PositionedMap<Ingredient> ingredients, int multiplier) {
         this.ingredientList = ingredients;
+        layout = list;
         this.context = context;
         setMultiplier(multiplier);
     }
 
     public PositionedMap<Ingredient> getIngredients() {
         return ingredientList;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        layout.removeAllViews();
+        for (int i = 0; i<ingredientList.size(); i++) {
+            layout.addView(getView(i, null, layout), i);
+        }
     }
 
     @Override
@@ -74,12 +82,8 @@ public class IngredientsAdapter extends BaseAdapter {
             notifyDataSetChanged();
         });
 
-        view.findViewById(R.id.choice).setOnClickListener(v->{
-            createIngredientsDialogList(position);
-        });
-        view.findViewById(R.id.unit_et).setOnClickListener(v->{
-            createUnitsDialogList(position);
-        });
+        view.findViewById(R.id.choice).setOnClickListener(v-> createIngredientsDialogList(position));
+        view.findViewById(R.id.unit_et).setOnClickListener(v-> createUnitsDialogList(position));
 
         view.findViewById(R.id.quantity_et).setOnFocusChangeListener((v, hasFocus) -> {
             try {
@@ -107,13 +111,16 @@ public class IngredientsAdapter extends BaseAdapter {
 
     public void addRow() {
         Ingredient ingredient = (Ingredient) Ingredient.EMPTY.clone();
-        ingredientList.put(ingredient.getId(),ingredient);
+        if(!ingredientList.ids().contains(Ingredient.EMPTY.getId()))
+            ingredientList.put(ingredient.getId(),ingredient);
         notifyDataSetChanged();
     }
 
     private void createIngredientsDialogList(int position){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Choose an ingredient");
+        if(IngredientsFactory.instance.getDataList().size() == 0)
+            throw new RuntimeException("list null");
         ItemAdapter itemAdapter = new ItemAdapter(IngredientsFactory.instance.getDataList(),context);
         builder.setAdapter(itemAdapter, (dialog, choice) -> {
             Ingredient i = IngredientsFactory.instance.getDataList().get(choice);

@@ -2,8 +2,8 @@ package com.example.dailyrecipes.queries;
 
 import androidx.annotation.NonNull;
 
-import com.example.dailyrecipes.model.QueryableFactory;
 import com.example.dailyrecipes.model.ItemModel;
+import com.example.dailyrecipes.model.QueryableFactory;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +21,7 @@ public class ListQuery<T extends ItemModel> extends Query<Void, Map<Integer, T>>
 
     @Override
     protected Map<Integer, T> formatData(String JSON) {
-        Map<Integer, T> list = new HashMap<Integer, T>();
+        Map<Integer, T> list = new HashMap<>();
         try{
         JSONArray array = new JSONArray(JSON);
         for (int i = 0; i < array.length(); i++) {

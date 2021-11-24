@@ -57,6 +57,7 @@ public class ConnectionManager extends ViewModel {
         Query<?, ?> q = queries.get(Integer.parseInt(queryIdString));
         if (q != null) {
             q.setJSONData(line.substring(queryIdString.length()));
+            queries.remove(q.id);
         }
         return q;
     }

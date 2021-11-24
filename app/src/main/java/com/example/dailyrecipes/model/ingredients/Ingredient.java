@@ -1,9 +1,12 @@
-package com.example.dailyrecipes.model;
+package com.example.dailyrecipes.model.ingredients;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+
+import com.example.dailyrecipes.model.ItemModel;
+import com.example.dailyrecipes.model.unit.Unit;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,7 +16,7 @@ import java.util.Objects;
 public class Ingredient extends ItemModel implements Parcelable{
     private Unit unit;
     private float quantity;
-    public static final Ingredient EMPTY = new Ingredient(0, "", new Unit(0, "",""), 0);
+    public static final Ingredient EMPTY = new Ingredient(0, "", Unit.EMPTY, 0);
 
     Ingredient(int id, String name, Unit unit, float quantity) {
         super(id, name);
@@ -89,7 +92,7 @@ public class Ingredient extends ItemModel implements Parcelable{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Ingredient that = (Ingredient) o;
-        return Float.compare(that.quantity, quantity) == 0 && unit.getId() == that.unit.getId();
+        return that.id == id;
     }
 
     @Override

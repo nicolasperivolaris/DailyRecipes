@@ -1,12 +1,15 @@
-package com.example.dailyrecipes.model;
+package com.example.dailyrecipes.model.unit;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.example.dailyrecipes.model.ItemModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Unit extends ItemModel implements Parcelable{
+    public static final Unit EMPTY = new Unit(0, "", "");
     private String symbol;
 
     Unit(int id, String name, String symbol) {

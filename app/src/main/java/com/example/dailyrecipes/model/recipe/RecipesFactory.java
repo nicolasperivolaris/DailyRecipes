@@ -1,14 +1,17 @@
-package com.example.dailyrecipes.model;
+package com.example.dailyrecipes.model.recipe;
 
+import com.example.dailyrecipes.model.QueryableFactory;
+import com.example.dailyrecipes.model.day.Day;
+import com.example.dailyrecipes.model.day.DayFactory;
+import com.example.dailyrecipes.model.ingredients.Ingredient;
+import com.example.dailyrecipes.model.ingredients.IngredientsFactory;
 import com.example.dailyrecipes.queries.Query;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.time.DayOfWeek;
 import java.util.ArrayList;
-import java.util.Observer;
 
 public class RecipesFactory extends QueryableFactory<Recipe> {
     public static RecipesFactory instance = new RecipesFactory();
@@ -39,13 +42,7 @@ public class RecipesFactory extends QueryableFactory<Recipe> {
             for (int i = 0; i < array.length(); i++)
                 ingredients.add(IngredientsFactory.instance.convertJSON(array.getJSONObject(i)));
         }
-
-        DayOfWeek day;
-        JSONObject object = jsonObject.getJSONObject("Day");
-        if(object.getBoolean("Valid"))
-            day = DayOfWeek.of(object.getInt("Int64"));
-        else
-            day = null;
+        Day day = DayFactory.instance.convertJSON(jsonObject.getJSONObject("Day"));
 
         return new Recipe(id, name,description, ingredients,multiplier, imageName, day);
     }

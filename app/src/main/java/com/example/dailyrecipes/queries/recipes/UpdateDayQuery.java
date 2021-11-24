@@ -1,20 +1,17 @@
 package com.example.dailyrecipes.queries.recipes;
 
-import com.example.dailyrecipes.model.ingredients.Ingredient;
 import com.example.dailyrecipes.model.recipe.Recipe;
 import com.example.dailyrecipes.queries.Query;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
-
-public class SaveRecipeQuery extends Query<List<Ingredient>, Integer> {
+public class UpdateDayQuery extends Query<Recipe, Integer> {
 
     private final Recipe recipe;
 
-    public SaveRecipeQuery(QueryListener<Integer> callback, Recipe recipe) {
-        super(callback, Flag.SAVE_RECIPE);
+    public UpdateDayQuery(QueryListener<Integer> callback, Recipe recipe) {
+        super(callback, Flag.SET_DAY_RECIPE);
         this.recipe = recipe;
     }
 

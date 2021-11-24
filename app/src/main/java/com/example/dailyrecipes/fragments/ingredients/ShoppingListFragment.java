@@ -11,9 +11,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.dailyrecipes.MainActivity;
 import com.example.dailyrecipes.R;
-import com.example.dailyrecipes.model.Ingredient;
+import com.example.dailyrecipes.model.ingredients.Ingredient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +22,7 @@ import java.util.List;
  */
 public class ShoppingListFragment extends Fragment {
 
+    private static List<Ingredient> shoppingList;
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
@@ -32,8 +32,7 @@ public class ShoppingListFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ShoppingListFragment() {
-    }
+    public ShoppingListFragment() {}
 
     @SuppressWarnings("unused")
     public static ShoppingListFragment newInstance(int columnCount, ArrayList<Ingredient> shoppingList) {
@@ -58,6 +57,8 @@ public class ShoppingListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_shopping_ingredients_list, container, false);
 
+        if(shoppingList == null) shoppingList = new ArrayList<>();
+
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
@@ -67,8 +68,8 @@ public class ShoppingListFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            List<Ingredient> list = ((MainActivity) requireActivity()).shoppingList;
-            recyclerView.setAdapter(new IngredientsRecyclerViewAdapter(list == null ? new ArrayList<>() : list));
+            //((MainActivity) requireActivity()).shoppingList;
+            recyclerView.setAdapter(new IngredientsRecyclerViewAdapter(shoppingList == null ? new ArrayList<>() : shoppingList));
         }
         return view;
     }

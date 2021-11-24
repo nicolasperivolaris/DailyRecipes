@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.dailyrecipes.databinding.FragmentShoppingListItemBinding;
-import com.example.dailyrecipes.model.Ingredient;
+import com.example.dailyrecipes.model.ingredients.Ingredient;
 
 import java.util.List;
 

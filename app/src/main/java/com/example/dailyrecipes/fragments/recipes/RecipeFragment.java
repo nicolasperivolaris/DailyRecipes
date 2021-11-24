@@ -5,27 +5,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.dailyrecipes.R;
-import com.example.dailyrecipes.model.Ingredient;
-import com.example.dailyrecipes.model.Recipe;
-import com.example.dailyrecipes.model.RecipesFactory;
-import com.example.dailyrecipes.model.Unit;
-import com.example.dailyrecipes.model.UnitsFactory;
+import com.example.dailyrecipes.fragments.ingredients.IngredientsAdapter;
+import com.example.dailyrecipes.model.ingredients.Ingredient;
+import com.example.dailyrecipes.model.recipe.Recipe;
+import com.example.dailyrecipes.model.recipe.RecipesFactory;
+import com.example.dailyrecipes.model.unit.UnitsFactory;
 import com.example.dailyrecipes.queries.ingredients.RecipeIngredientsQuery;
 import com.example.dailyrecipes.queries.recipes.SaveRecipeQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
-import com.example.dailyrecipes.fragments.ingredients.IngredientsAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RecipeFragment extends Fragment {
     private ConnectionManager connection;
@@ -35,7 +31,7 @@ public class RecipeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.show_recipe, container, false);
+        View view = inflater.inflate(R.layout.show_recipe2, container, false);
         connection = new ViewModelProvider(requireActivity()).get(ConnectionManager.class);
         initSpinner(view);
         initEditMode(view);
@@ -70,16 +66,17 @@ public class RecipeFragment extends Fragment {
             recipe.setName(((EditText)view.findViewById(R.id.recipeName_et)).getText().toString());
             recipe.setDescription(((EditText)view.findViewById(R.id.description_et)).getText().toString());
             recipe.setMultiplier(Integer.parseInt(((TextView)view.findViewById(R.id.amount_tv)).getText().toString()));
+            recipe.getIngredients().remove(Ingredient.EMPTY);
             SaveRecipeQuery query = new SaveRecipeQuery(this::savedCallBack, recipe);
             connection.make(query);
-            Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT);
+            Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT).show();
         });
     }
 
     private void savedCallBack(Integer errorCode) {
         requireActivity().runOnUiThread(() -> {
-            if (errorCode != 0) Toast.makeText(getContext(), "Error while saving", Toast.LENGTH_LONG);
-            else Toast.makeText(getContext(), "Saved", Toast.LENGTH_LONG);
+            if (errorCode != 0) Toast.makeText(getContext(), "Error while saving", Toast.LENGTH_LONG).show();
+            else Toast.makeText(getContext(), "Saved", Toast.LENGTH_LONG).show();
         });
     }
 
@@ -121,10 +118,9 @@ public class RecipeFragment extends Fragment {
                 i.setUnit(UnitsFactory.instance.getDataList().get((Integer)i.getUnit().getId()));
             }
 
-            ingredientsAdapter = new IngredientsAdapter(getContext(), result.getIngredients(), multiplier);
+            LinearLayoutCompat list = view.findViewById(R.id.ingredients_list);
+            ingredientsAdapter = new IngredientsAdapter(list, getContext(), result.getIngredients(), multiplier);
 
-            ListView list = view.findViewById(R.id.ingredients_list);
-            list.setAdapter(ingredientsAdapter);
         });
     }
 }

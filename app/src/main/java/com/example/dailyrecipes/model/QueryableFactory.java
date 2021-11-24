@@ -1,16 +1,14 @@
 package com.example.dailyrecipes.model;
 
+import com.example.dailyrecipes.queries.ListQuery;
 import com.example.dailyrecipes.queries.Query;
 import com.example.dailyrecipes.queries.ingredients.AddQuery;
-import com.example.dailyrecipes.queries.ListQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
 import com.example.dailyrecipes.utils.PositionedMap;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 

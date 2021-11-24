@@ -1,4 +1,4 @@
-package com.example.dailyrecipes.model;
+package com.example.dailyrecipes.model.recipe;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -6,6 +6,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.example.dailyrecipes.model.ItemModel;
+import com.example.dailyrecipes.model.day.Day;
+import com.example.dailyrecipes.model.ingredients.Ingredient;
 import com.example.dailyrecipes.utils.PositionedMap;
 
 import org.json.JSONArray;
@@ -16,25 +19,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.time.DayOfWeek;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Recipe extends ItemModel implements Parcelable{
     private String description;
     private PositionedMap<Ingredient> ingredients = new PositionedMap<>();
     private int multiplier = 1;
     private String imageName;
-    private DayOfWeek day;
+    private Day day;
 
     Recipe(){
         super(0, "");
         day = null;
     }
 
-    Recipe(int id, String name, String description, PositionedMap<Ingredient> ingredients, int multiplier, String imageName, DayOfWeek day) {
+    Recipe(int id, String name, String description, PositionedMap<Ingredient> ingredients, int multiplier, String imageName, Day day) {
         super(id, name);
         this.ingredients = ingredients;
         this.description = description;
@@ -43,7 +43,7 @@ public class Recipe extends ItemModel implements Parcelable{
         this.day = day;
     }
 
-    Recipe(int id, String name, String description, List<Ingredient> ingredients, int multiplier, String imageName, DayOfWeek day) {
+    Recipe(int id, String name, String description, List<Ingredient> ingredients, int multiplier, String imageName, Day day) {
         this(id, name, description, new PositionedMap<>(), multiplier, imageName,day);
         for (Ingredient i:ingredients) {
             this.ingredients.put(i.id, i);
@@ -59,11 +59,7 @@ public class Recipe extends ItemModel implements Parcelable{
             List<Ingredient> ingredients = in.readArrayList(Ingredient.class.getClassLoader());
             int multiplier = in.readInt();
             String imageName = in.readString();
-
-            DayOfWeek day;
-            int d = in.readInt();
-            if(d<0)day = null;
-            else day = DayOfWeek.of(d);
+            Day day = in.readParcelable(Day.class.getClassLoader());
 
             return new Recipe(id, name,description, ingredients, multiplier, imageName, day);
         }
@@ -86,7 +82,9 @@ public class Recipe extends ItemModel implements Parcelable{
         for (Ingredient i : this.ingredients.values())
             ingredients.put(i.convertToJSON());
         result.accumulate("Ingredients", ingredients);
-        if(day != null) result.accumulate("Day", day.getValue());
+        if(day != null)
+            result.accumulate("Day", day.convertToJSON());
+        JSONObject x = result.getJSONObject("Day");
         return result;
     }
 
@@ -106,20 +104,8 @@ public class Recipe extends ItemModel implements Parcelable{
         this.description = description;
     }
 
-    public java.lang.String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public PositionedMap<Ingredient> getIngredients() {
         return ingredients;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public Bitmap getImage() {
@@ -152,7 +138,7 @@ public class Recipe extends ItemModel implements Parcelable{
         if(day == null)
             dest.writeInt(-1);
         else
-            dest.writeInt(day.getValue());
+            dest.writeParcelable(day, Parcelable.CONTENTS_FILE_DESCRIPTOR);
     }
 
     public void setIngredients(PositionedMap<Ingredient> ingredients) {
@@ -165,11 +151,11 @@ public class Recipe extends ItemModel implements Parcelable{
         }
     }
 
-    public DayOfWeek getDay() {
+    public Day getDay() {
         return day;
     }
 
-    public void setDay(DayOfWeek day) {
+    public void setDay(Day day) {
         this.day = day;
     }
 }

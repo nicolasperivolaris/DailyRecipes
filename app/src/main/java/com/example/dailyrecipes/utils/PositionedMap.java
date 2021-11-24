@@ -2,7 +2,6 @@ package com.example.dailyrecipes.utils;
 
 import androidx.annotation.Nullable;
 
-import com.example.dailyrecipes.model.Ingredient;
 import com.example.dailyrecipes.model.ItemModel;
 
 import java.util.Collection;
@@ -22,19 +21,36 @@ public class PositionedMap<T extends ItemModel>{
 
     public PositionedMap(Map<Integer, T> items) {
         keysPositions.addAll(items.keySet());
-        this.items = new HashMap<Integer, T>(items);
+        this.items = new HashMap<>(items);
     }
 
     public Collection<T> values(){
-        return items.values();
+        return Collections.unmodifiableList(new LinkedList<>(items.values()));
     }
 
     public List<Integer> ids(){
         return Collections.unmodifiableList(keysPositions);
     }
 
+    public int getPosition(T item){
+        if(item != null) {
+            int i = 0;
+            for (Integer id : keysPositions) {
+                if (item.getId().equals(id))
+                    return i;
+                i++;
+            }
+        }
+        return -1;
+    }
+
     public T get(int position) {
-        return items.get(keysPositions.get(position));
+        if(position > keysPositions.size()-1)
+            throw new ArrayIndexOutOfBoundsException(position + " > " + keysPositions.size());
+        T i = items.get(keysPositions.get(position));
+                if(i == null)
+                    throw new ArrayIndexOutOfBoundsException(position + " > " + keysPositions.size());
+        return i;
     }
 
     public T get(Integer id) {
@@ -46,6 +62,7 @@ public class PositionedMap<T extends ItemModel>{
     }
 
     public T replace(int position, T newValue){
+        if(items.containsKey(newValue.getId()))return null;
         Integer id = keysPositions.remove(position);
         items.remove(id);
         keysPositions.add(position, newValue.getId());
@@ -53,13 +70,22 @@ public class PositionedMap<T extends ItemModel>{
     }
 
     @Nullable
-    public T put(Integer key, T value) {
+    public T put(Integer key, T value){
+        if(items.containsKey(value.getId()))return null;
+        if(items.containsKey(value)){
+            return null;
+        }
         keysPositions.add(key);
         return items.put(key, value);
     }
 
     @Nullable
     public T put(int position, T value){
+        if(items.containsKey(value.getId()))return null;
+        if(items.containsKey(value)){
+            return null;
+        }
+
         if(keysPositions.size()>position)
             keysPositions.add(position, value.getId());
         else keysPositions.add(value.getId());
@@ -75,8 +101,8 @@ public class PositionedMap<T extends ItemModel>{
     }
 
     @Nullable
-    public T remove(int key) {
-        Integer id = keysPositions.remove(key);
+    public T remove(int position) {
+        Integer id = keysPositions.remove(position);
         return items.remove(id);
     }
 }

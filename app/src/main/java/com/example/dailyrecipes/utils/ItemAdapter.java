@@ -7,11 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.example.dailyrecipes.R;
 import com.example.dailyrecipes.model.ItemModel;
-import com.example.dailyrecipes.model.Unit;
-
-import java.util.Map;
 
 public class ItemAdapter extends BaseAdapter {
 
