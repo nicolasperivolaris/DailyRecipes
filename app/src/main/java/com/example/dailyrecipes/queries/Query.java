@@ -9,16 +9,16 @@ public abstract class Query<Param, Result> {
 
     private static int currentId = 0;
     public final int id;
-    private final QueryListener listener;
+    private final QueryListener<Result> listener;
     private Param param;
     private Result dataSet;
     protected Flag flag;
 
-    private Query(QueryListener callback) {
+    private Query(QueryListener<Result> callback) {
         id = getNewId();
         this.listener = callback;
     }
-    protected Query(QueryListener callback, Flag flag) {
+    protected Query(QueryListener<Result> callback, Flag flag) {
         this(callback);
         this.flag = flag;
     }
@@ -33,7 +33,9 @@ public abstract class Query<Param, Result> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Thread t = new Thread(() -> listener.dataReceived(getData()));
+        Thread t = new Thread(() ->
+                listener.dataReceived(getData())
+        );
         t.start();
     }
 
@@ -104,7 +106,10 @@ public abstract class Query<Param, Result> {
         GET_SHOPPING_LIST(4),
         SAVE_RECIPE(5),
         GET_INGREDIENT_LIST(6),
-        GET_UNIT_LIST(7);
+        GET_UNIT_LIST(7),
+        GET_DAY_LIST(8),
+        SET_DAY_RECIPE(9),
+        GET_RECIPE_AND_ALL(10);
         public final int id;
         Flag(int i){
             id = i;

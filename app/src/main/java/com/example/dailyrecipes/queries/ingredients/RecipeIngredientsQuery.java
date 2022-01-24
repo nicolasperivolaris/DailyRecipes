@@ -24,7 +24,7 @@ public class RecipeIngredientsQuery extends Query<Void, Recipe> {
 
         JSONArray array = new JSONArray(json);
         for (int i = 0; i < array.length(); i++) {
-            ingredients.add(IngredientsFactory.instance.convertJSON(array.getJSONObject(i)));
+            //ingredients.add(IngredientsFactory.instance.convertJSON(array.getJSONObject(i)));
         }
         getData().setIngredients(ingredients);
 

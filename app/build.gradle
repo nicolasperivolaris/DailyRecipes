@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    compileSdk 30
+    compileSdk 29
 
     defaultConfig {
         applicationId "com.example.dailyrecipes"
-        minSdk 25
-        targetSdk 30
+        minSdk 29
+        targetSdk 29
         versionCode 1
         versionName "1.0"
 

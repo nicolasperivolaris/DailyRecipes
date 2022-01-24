@@ -5,21 +5,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.dailyrecipes.MainActivity;
 import com.example.dailyrecipes.R;
+import com.example.dailyrecipes.fragments.ingredients.IngredientsAdapter;
+import com.example.dailyrecipes.model.Ingredient;
+import com.example.dailyrecipes.model.IngredientsFactory;
 import com.example.dailyrecipes.model.Recipe;
 import com.example.dailyrecipes.model.RecipesFactory;
+import com.example.dailyrecipes.model.UnitsFactory;
 import com.example.dailyrecipes.queries.ingredients.RecipeIngredientsQuery;
 import com.example.dailyrecipes.queries.recipes.SaveRecipeQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
-import com.example.dailyrecipes.fragments.ingredients.IngredientsAdapter;
 
 public class RecipeFragment extends Fragment {
     private ConnectionManager connection;
@@ -29,7 +33,7 @@ public class RecipeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.show_recipe, container, false);
+        View view = inflater.inflate(R.layout.show_recipe2, container, false);
         connection = new ViewModelProvider(requireActivity()).get(ConnectionManager.class);
         initSpinner(view);
         initEditMode(view);
@@ -38,12 +42,11 @@ public class RecipeFragment extends Fragment {
         if(getArguments() != null) {
             if (getArguments().containsKey("recipe")) {
                 recipe = (Recipe) getArguments().get("recipe");
-                connection.make(new RecipeIngredientsQuery(recipe, (res) -> setRecipe(view, res)));
             }
             else {
-                recipe = RecipesFactory.instance.newInstance();
-                setRecipe(view, recipe);
+                recipe = RecipesFactory.newInstance();
             }
+            setRecipe(view, recipe);
 
             if(getArguments().containsKey("editable"))
                 ((SwitchCompat) view.findViewById(R.id.edit_sw)).setChecked(getArguments().getBoolean("editable"));
@@ -56,6 +59,8 @@ public class RecipeFragment extends Fragment {
             view.findViewById(R.id.description_et).setFocusableInTouchMode(false);
         }
 
+        
+
         return view;
     }
 
@@ -64,16 +69,18 @@ public class RecipeFragment extends Fragment {
             recipe.setName(((EditText)view.findViewById(R.id.recipeName_et)).getText().toString());
             recipe.setDescription(((EditText)view.findViewById(R.id.description_et)).getText().toString());
             recipe.setMultiplier(Integer.parseInt(((TextView)view.findViewById(R.id.amount_tv)).getText().toString()));
+            recipe.getIngredients().remove(Ingredient.EMPTY);
             SaveRecipeQuery query = new SaveRecipeQuery(this::savedCallBack, recipe);
             connection.make(query);
-            Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT);
+
+            Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT).show();
         });
     }
 
     private void savedCallBack(Integer errorCode) {
         requireActivity().runOnUiThread(() -> {
-            if (errorCode != 0) Toast.makeText(getContext(), "Error while saving", Toast.LENGTH_LONG);
-            else Toast.makeText(getContext(), "Saved", Toast.LENGTH_LONG);
+            if (errorCode != 0) Toast.makeText(getContext(), "Error while saving", Toast.LENGTH_LONG).show();
+            else Toast.makeText(getContext(), "Saved", Toast.LENGTH_LONG).show();
         });
     }
 
@@ -91,29 +98,30 @@ public class RecipeFragment extends Fragment {
     }
 
     private void initSpinner(View view) {
-        ((TextView) view.findViewById(R.id.amount_tv)).setText(Integer.toString(multiplier));
+        ((TextView) view.findViewById(R.id.amount_tv)).setText(multiplier + "");
         view.findViewById(R.id.plus_bt).setOnClickListener(v -> {
             multiplier++;
-            ((TextView) view.findViewById(R.id.amount_tv)).setText(Integer.toString(multiplier));
+            ((TextView) view.findViewById(R.id.amount_tv)).setText(multiplier + "");
             ingredientsAdapter.setMultiplier(multiplier);
         });
         view.findViewById(R.id.min_bt).setOnClickListener(v -> {
             multiplier--;
-            ((TextView) view.findViewById(R.id.amount_tv)).setText(Integer.toString(multiplier));
+            ((TextView) view.findViewById(R.id.amount_tv)).setText(multiplier + "");
             ingredientsAdapter.setMultiplier(multiplier);
         });
     }
 
     private void setRecipe(View view, Recipe result) {
+        IngredientsFactory ingredientsFactory = MainActivity.recipesFactory.getIngredientsFactory();
         multiplier = result.getMultiplier();
 
-        getActivity().runOnUiThread(() -> {
+        requireActivity().runOnUiThread(() -> {
             ((EditText) view.findViewById(R.id.recipeName_et)).setText(result.getName());
             ((EditText) view.findViewById(R.id.description_et)).setText(result.getDescription());
-            ingredientsAdapter = new IngredientsAdapter(getContext(), result.getIngredients(), multiplier);
 
-            ListView list = view.findViewById(R.id.ingredients_list);
-            list.setAdapter(ingredientsAdapter);
+            LinearLayoutCompat list = view.findViewById(R.id.ingredients_list);
+            ingredientsAdapter = new IngredientsAdapter(list, getContext(), result.getIngredients(), ingredientsFactory, multiplier);
+
         });
     }
 }

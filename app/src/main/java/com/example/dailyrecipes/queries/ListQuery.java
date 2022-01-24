@@ -2,32 +2,31 @@ package com.example.dailyrecipes.queries;
 
 import androidx.annotation.NonNull;
 
+import com.example.dailyrecipes.model.ItemModel;
 import com.example.dailyrecipes.model.QueryableFactory;
-import com.example.dailyrecipes.queries.Query;
-import com.example.dailyrecipes.utils.JSONable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public class ListQuery<T extends JSONable<T>> extends Query<Void, List<T>> {
+public class ListQuery<T extends ItemModel> extends Query<Void, Map<Integer, T>> {
     private final QueryableFactory<T> factory;
 
-    public ListQuery(QueryableFactory<T> factory, QueryListener<List<T>> run) {
+    public ListQuery(QueryableFactory<T> factory, QueryListener<Map<Integer, T>> run) {
         super(run, factory.getFlag());
         this.factory = factory;
     }
 
     @Override
-    protected List<T> formatData(String JSON) throws JSONException {
-        List<T> list = new ArrayList<>();
+    protected Map<Integer, T> formatData(String JSON) {
+        Map<Integer, T> list = new HashMap<>();
         try{
         JSONArray array = new JSONArray(JSON);
         for (int i = 0; i < array.length(); i++) {
             T t = factory.convertJSON(array.getJSONObject(i));
-            list.add(t);
+            list.put(t.getId(), t);
         }
         }catch(JSONException e){
             e.printStackTrace();

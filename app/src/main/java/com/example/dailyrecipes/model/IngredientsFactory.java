@@ -1,12 +1,21 @@
 package com.example.dailyrecipes.model;
 
 import com.example.dailyrecipes.queries.Query;
+import com.example.dailyrecipes.utils.ConnectionManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class IngredientsFactory extends QueryableFactory<Ingredient>{
-    public static IngredientsFactory instance = new IngredientsFactory();
+public class IngredientsFactory extends QueryableFactory<Ingredient> {
+    private final UnitsFactory unitsFactory;
+    public IngredientsFactory(ConnectionManager connectionManager){
+        super(connectionManager);
+        unitsFactory = new UnitsFactory(connectionManager);
+    }
+
+    public UnitsFactory getUnitsFactory() {
+        return unitsFactory;
+    }
 
     @Override
     public Query.Flag getFlag() {
@@ -25,7 +34,7 @@ public class IngredientsFactory extends QueryableFactory<Ingredient>{
         int id = jsonObject.getInt("Id");
         String name = jsonObject.getString("Name");
         float quantity = (float) jsonObject.getDouble("Quantity");
-        Unit unit = UnitsFactory.instance.convertJSON(jsonObject.getJSONObject("Unit"));
+        Unit unit = unitsFactory.convertJSON(jsonObject.getJSONObject("Unit"));
         return new Ingredient(id, name, unit, quantity);
     }
 

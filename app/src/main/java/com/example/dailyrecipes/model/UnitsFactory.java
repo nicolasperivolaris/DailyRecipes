@@ -1,17 +1,17 @@
 package com.example.dailyrecipes.model;
 
+import com.example.dailyrecipes.model.QueryableFactory;
+import com.example.dailyrecipes.model.Unit;
 import com.example.dailyrecipes.queries.Query;
+import com.example.dailyrecipes.utils.ConnectionManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Collections;
-import java.util.List;
-
 public class UnitsFactory extends QueryableFactory<Unit> {
-
-    public static UnitsFactory instance = new UnitsFactory();
-    private UnitsFactory(){};
+    public UnitsFactory(ConnectionManager connectionManager){
+        super(connectionManager);
+    };
 
     @Override
     public Query.Flag getFlag() {
@@ -20,8 +20,9 @@ public class UnitsFactory extends QueryableFactory<Unit> {
 
     public String[] getNames(){
         String[] UnitsName = new String[dataList.size()];
-        for (int i = 0; i< dataList.size(); i++) {
-            UnitsName[i] = dataList.get(i).getName();
+        int cp = 0;
+        for (Integer i : dataList.ids()) {
+            UnitsName[cp++] = dataList.get(i).getName();
         }
         return UnitsName;
     }

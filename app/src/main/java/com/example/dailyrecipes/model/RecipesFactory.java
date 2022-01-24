@@ -1,17 +1,38 @@
 package com.example.dailyrecipes.model;
 
 import com.example.dailyrecipes.queries.Query;
+import com.example.dailyrecipes.queries.recipes.FillRecipeQuery;
+import com.example.dailyrecipes.utils.ConnectionManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Observer;
+import java.util.List;
 
 public class RecipesFactory extends QueryableFactory<Recipe> {
-    public static RecipesFactory instance = new RecipesFactory();
-    private RecipesFactory(){};
+    private final IngredientsFactory ingredientsFactory;
+    private final DayFactory dayFactory;
+
+    public RecipesFactory(ConnectionManager connectionManager){
+        super(connectionManager);
+        ingredientsFactory = new IngredientsFactory(connectionManager);
+        dayFactory = new DayFactory(connectionManager);
+
+        wait(this);
+        wait(ingredientsFactory);
+        wait(dayFactory);
+        connection.make(new FillRecipeQuery(recipes -> {}, this));
+    };
+
+    public IngredientsFactory getIngredientsFactory() {
+        return ingredientsFactory;
+    }
+
+    public DayFactory getDayFactory() {
+        return dayFactory;
+    }
 
     @Override
     public Query.Flag getFlag() {
@@ -32,16 +53,20 @@ public class RecipesFactory extends QueryableFactory<Recipe> {
         String description = jsonObject.getString("Description");
         int multiplier = jsonObject.getInt("Multiplier");
         String imageName = jsonObject.getString("ImagePath");
+
         ArrayList<Ingredient> ingredients = new ArrayList<>();
         if (!jsonObject.isNull("Ingredients")){
             JSONArray array = jsonObject.getJSONArray("Ingredients");
             for (int i = 0; i < array.length(); i++)
-                ingredients.add(IngredientsFactory.instance.convertJSON(array.getJSONObject(i)));
+                ingredients.add(ingredientsFactory.convertJSON(array.getJSONObject(i)));
         }
-        return new Recipe(id, name,description, ingredients,multiplier, imageName);
+        Day day = dayFactory.convertJSON(jsonObject.getJSONObject("Day"));
+
+        return new Recipe(id, name,description, ingredients,multiplier, imageName, day);
     }
 
-    public Recipe newInstance(){
+    public static Recipe newInstance(){
         return new Recipe();
     }
+
 }
