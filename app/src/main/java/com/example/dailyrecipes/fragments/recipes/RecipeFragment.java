@@ -13,12 +13,14 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.dailyrecipes.MainActivity;
 import com.example.dailyrecipes.R;
 import com.example.dailyrecipes.fragments.ingredients.IngredientsAdapter;
-import com.example.dailyrecipes.model.ingredients.Ingredient;
-import com.example.dailyrecipes.model.recipe.Recipe;
-import com.example.dailyrecipes.model.recipe.RecipesFactory;
-import com.example.dailyrecipes.model.unit.UnitsFactory;
+import com.example.dailyrecipes.model.Ingredient;
+import com.example.dailyrecipes.model.IngredientsFactory;
+import com.example.dailyrecipes.model.Recipe;
+import com.example.dailyrecipes.model.RecipesFactory;
+import com.example.dailyrecipes.model.UnitsFactory;
 import com.example.dailyrecipes.queries.ingredients.RecipeIngredientsQuery;
 import com.example.dailyrecipes.queries.recipes.SaveRecipeQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
@@ -40,12 +42,11 @@ public class RecipeFragment extends Fragment {
         if(getArguments() != null) {
             if (getArguments().containsKey("recipe")) {
                 recipe = (Recipe) getArguments().get("recipe");
-                connection.make(new RecipeIngredientsQuery(recipe, (res) -> setRecipe(view, res)));
             }
             else {
-                recipe = RecipesFactory.instance.newInstance();
-                setRecipe(view, recipe);
+                recipe = RecipesFactory.newInstance();
             }
+            setRecipe(view, recipe);
 
             if(getArguments().containsKey("editable"))
                 ((SwitchCompat) view.findViewById(R.id.edit_sw)).setChecked(getArguments().getBoolean("editable"));
@@ -58,6 +59,8 @@ public class RecipeFragment extends Fragment {
             view.findViewById(R.id.description_et).setFocusableInTouchMode(false);
         }
 
+        
+
         return view;
     }
 
@@ -69,6 +72,7 @@ public class RecipeFragment extends Fragment {
             recipe.getIngredients().remove(Ingredient.EMPTY);
             SaveRecipeQuery query = new SaveRecipeQuery(this::savedCallBack, recipe);
             connection.make(query);
+
             Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT).show();
         });
     }
@@ -94,32 +98,29 @@ public class RecipeFragment extends Fragment {
     }
 
     private void initSpinner(View view) {
-        ((TextView) view.findViewById(R.id.amount_tv)).setText(Integer.toString(multiplier));
+        ((TextView) view.findViewById(R.id.amount_tv)).setText(multiplier + "");
         view.findViewById(R.id.plus_bt).setOnClickListener(v -> {
             multiplier++;
-            ((TextView) view.findViewById(R.id.amount_tv)).setText(Integer.toString(multiplier));
+            ((TextView) view.findViewById(R.id.amount_tv)).setText(multiplier + "");
             ingredientsAdapter.setMultiplier(multiplier);
         });
         view.findViewById(R.id.min_bt).setOnClickListener(v -> {
             multiplier--;
-            ((TextView) view.findViewById(R.id.amount_tv)).setText(Integer.toString(multiplier));
+            ((TextView) view.findViewById(R.id.amount_tv)).setText(multiplier + "");
             ingredientsAdapter.setMultiplier(multiplier);
         });
     }
 
     private void setRecipe(View view, Recipe result) {
+        IngredientsFactory ingredientsFactory = MainActivity.recipesFactory.getIngredientsFactory();
         multiplier = result.getMultiplier();
 
-        getActivity().runOnUiThread(() -> {
+        requireActivity().runOnUiThread(() -> {
             ((EditText) view.findViewById(R.id.recipeName_et)).setText(result.getName());
             ((EditText) view.findViewById(R.id.description_et)).setText(result.getDescription());
 
-            for (Ingredient i:result.getIngredients().values()) {
-                i.setUnit(UnitsFactory.instance.getDataList().get((Integer)i.getUnit().getId()));
-            }
-
             LinearLayoutCompat list = view.findViewById(R.id.ingredients_list);
-            ingredientsAdapter = new IngredientsAdapter(list, getContext(), result.getIngredients(), multiplier);
+            ingredientsAdapter = new IngredientsAdapter(list, getContext(), result.getIngredients(), ingredientsFactory, multiplier);
 
         });
     }

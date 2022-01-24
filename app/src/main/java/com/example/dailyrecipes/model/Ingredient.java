@@ -1,12 +1,9 @@
-package com.example.dailyrecipes.model.ingredients;
+package com.example.dailyrecipes.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
-
-import com.example.dailyrecipes.model.ItemModel;
-import com.example.dailyrecipes.model.unit.Unit;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,9 +66,9 @@ public class Ingredient extends ItemModel implements Parcelable{
     }
 
     @NonNull
+    @Override
     public Object clone(){
-        Ingredient i = new Ingredient(id, name, unit, quantity);
-        return i;
+        return new Ingredient(id, name, unit, quantity);
     }
 
     @Override
@@ -92,11 +89,11 @@ public class Ingredient extends ItemModel implements Parcelable{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Ingredient that = (Ingredient) o;
-        return that.id == id;
+        return that.id.equals(id) && (unit != null && that.unit != null) && unit.getId().equals(that.unit.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(unit, quantity);
+        return Objects.hash(id);
     }
 }

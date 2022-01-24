@@ -83,7 +83,7 @@ public class ConnectionManager extends ViewModel {
         t.start();
     }
 
-    public void make(Query<?, ?> query) {
+    public Thread make(Query<?, ?> query) {
         Thread t = new Thread(() -> {
             int time = 0;
             boolean send = false;
@@ -101,6 +101,7 @@ public class ConnectionManager extends ViewModel {
         });
 
         t.start();
+        return t;
     }
 
     public boolean isReady() {

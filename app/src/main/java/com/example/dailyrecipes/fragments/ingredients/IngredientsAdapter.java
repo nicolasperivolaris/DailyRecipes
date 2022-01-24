@@ -12,25 +12,26 @@ import android.widget.TextView;
 import androidx.appcompat.widget.LinearLayoutCompat;
 
 import com.example.dailyrecipes.R;
-import com.example.dailyrecipes.model.ingredients.Ingredient;
-import com.example.dailyrecipes.model.ingredients.IngredientsFactory;
-import com.example.dailyrecipes.model.unit.Unit;
-import com.example.dailyrecipes.model.unit.UnitsFactory;
+import com.example.dailyrecipes.model.Ingredient;
+import com.example.dailyrecipes.model.IngredientsFactory;
+import com.example.dailyrecipes.model.Unit;
 import com.example.dailyrecipes.utils.ItemAdapter;
 import com.example.dailyrecipes.utils.PositionedMap;
 
 public class IngredientsAdapter extends BaseAdapter {
+    private final IngredientsFactory ingredientsFactory;
     private final PositionedMap<Ingredient> ingredientList;
     private final LinearLayoutCompat layout;
     private final Context context;
     private int multiplier;
     private boolean editable;
 
-    public IngredientsAdapter(LinearLayoutCompat list, Context context, PositionedMap<Ingredient> ingredients, int multiplier) {
+    public IngredientsAdapter(LinearLayoutCompat list, Context context, PositionedMap<Ingredient> ingredients, IngredientsFactory ingredientsFactory,  int multiplier) {
         this.ingredientList = ingredients;
         layout = list;
         this.context = context;
         setMultiplier(multiplier);
+        this.ingredientsFactory = ingredientsFactory;
     }
 
     public PositionedMap<Ingredient> getIngredients() {
@@ -85,7 +86,7 @@ public class IngredientsAdapter extends BaseAdapter {
         view.findViewById(R.id.choice).setOnClickListener(v-> createIngredientsDialogList(position));
         view.findViewById(R.id.unit_et).setOnClickListener(v-> createUnitsDialogList(position));
 
-        view.findViewById(R.id.quantity_et).setOnFocusChangeListener((v, hasFocus) -> {
+        view.findViewById(R.id.quantity_tv).setOnFocusChangeListener((v, hasFocus) -> {
             try {
                 if (!hasFocus)
                     ingredientList.get(position).setQuantity(Float.parseFloat(String.valueOf(((EditText) v).getText()))/multiplier);
@@ -96,12 +97,12 @@ public class IngredientsAdapter extends BaseAdapter {
 
         Ingredient ingredient = ingredientList.get(position);
         ((TextView) view.findViewById(R.id.choice)).setText(ingredient.getName());
-        ((EditText) view.findViewById(R.id.quantity_et)).setText(Float.toString(ingredient.getQuantity() * multiplier));
-        ((TextView) view.findViewById(R.id.unit_et)).setText(ingredient.getUnit().getSymbol());
+        ((EditText) view.findViewById(R.id.quantity_tv)).setText(Float.toString(ingredient.getQuantity() * multiplier));
+        ((TextView) view.findViewById(R.id.unit_et)).setText(ingredient.getUnit() != null ? ingredient.getUnit().getSymbol() : "");
 
         view.findViewById(R.id.choice).setEnabled(editable);
-        view.findViewById(R.id.quantity_et).setFocusable(editable);
-        view.findViewById(R.id.quantity_et).setFocusableInTouchMode(editable);
+        view.findViewById(R.id.quantity_tv).setFocusable(editable);
+        view.findViewById(R.id.quantity_tv).setFocusableInTouchMode(editable);
         view.findViewById(R.id.unit_et).setClickable(editable);
         view.findViewById(R.id.unit_et).setFocusable(editable);
         view.findViewById(R.id.delete_bt).setEnabled(editable);
@@ -119,11 +120,11 @@ public class IngredientsAdapter extends BaseAdapter {
     private void createIngredientsDialogList(int position){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Choose an ingredient");
-        if(IngredientsFactory.instance.getDataList().size() == 0)
+        if(ingredientsFactory.getDataList().size() == 0)
             throw new RuntimeException("list null");
-        ItemAdapter itemAdapter = new ItemAdapter(IngredientsFactory.instance.getDataList(),context);
+        ItemAdapter itemAdapter = new ItemAdapter(ingredientsFactory.getDataList(),context);
         builder.setAdapter(itemAdapter, (dialog, choice) -> {
-            Ingredient i = IngredientsFactory.instance.getDataList().get(choice);
+            Ingredient i = ingredientsFactory.getDataList().get(choice);
             ingredientList.replace(position, i);
             notifyDataSetChanged();
         });
@@ -137,7 +138,7 @@ public class IngredientsAdapter extends BaseAdapter {
     private void createUnitsDialogList(int position){
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Choose an unit");
-        ItemAdapter itemAdapter = new ItemAdapter(UnitsFactory.instance.getDataList(),context);
+        ItemAdapter itemAdapter = new ItemAdapter(ingredientsFactory.getUnitsFactory().getDataList(),context);
         builder.setAdapter(itemAdapter, (dialog, which) -> {
             ingredientList.get(position).setUnit((Unit) itemAdapter.getItemByPosition(which));
             notifyDataSetChanged();

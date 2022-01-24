@@ -1,14 +1,16 @@
-package com.example.dailyrecipes.model.day;
+package com.example.dailyrecipes.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.example.dailyrecipes.model.ItemModel;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 public class Day extends ItemModel implements Parcelable {
+    public static final Day NOT_DAY = new Day(-1, "Not planned");
+
     Day(int id, String name){
         super(id, name);
     }
@@ -46,5 +48,18 @@ public class Day extends ItemModel implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
         dest.writeString(name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Day that = (Day) o;
+        return that.id == id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

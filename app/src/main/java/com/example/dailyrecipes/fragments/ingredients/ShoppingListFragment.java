@@ -11,22 +11,28 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.dailyrecipes.MainActivity;
 import com.example.dailyrecipes.R;
-import com.example.dailyrecipes.model.ingredients.Ingredient;
+import com.example.dailyrecipes.model.Day;
+import com.example.dailyrecipes.model.Ingredient;
+import com.example.dailyrecipes.model.Recipe;
+import com.example.dailyrecipes.model.RecipesFactory;
+import com.example.dailyrecipes.model.Unit;
+import com.example.dailyrecipes.utils.ConnectionManager;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 /**
  * A fragment representing a list of Items.
  */
 public class ShoppingListFragment extends Fragment {
 
-    private static List<Ingredient> shoppingList;
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
+    private static ConnectionManager connection;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -57,7 +63,17 @@ public class ShoppingListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_shopping_ingredients_list, container, false);
 
-        if(shoppingList == null) shoppingList = new ArrayList<>();
+        HashMap<PairIdUnit, Ingredient> ingredientList = new HashMap<>();
+
+        for (Recipe recipe: MainActivity.recipesFactory.getDataList().values()) {
+            if(recipe.getDay().equals(Day.NOT_DAY)) continue;
+            for (Ingredient i: recipe.getIngredients().values()) {
+                Ingredient temp = ingredientList.get(new PairIdUnit(i.getId(), i.getUnit()));
+                if(temp !=null //if ingredientList contains i
+                        && temp.getUnit().equals(i.getUnit())) temp.setQuantity(temp.getQuantity() + i.getQuantity());
+                else ingredientList.put(new PairIdUnit(i.getId(), i.getUnit()), i);
+            }
+        }
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -68,9 +84,17 @@ public class ShoppingListFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            //((MainActivity) requireActivity()).shoppingList;
-            recyclerView.setAdapter(new IngredientsRecyclerViewAdapter(shoppingList == null ? new ArrayList<>() : shoppingList));
+            recyclerView.setAdapter(new IngredientsRecyclerViewAdapter(new ArrayList<>(ingredientList.values())));
         }
         return view;
+    }
+
+    private class PairIdUnit{
+        Integer id;
+        Unit unit;
+        PairIdUnit(Integer id, Unit unit){
+            this.id = id;
+            this.unit = unit;
+        }
     }
 }

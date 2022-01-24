@@ -8,20 +8,26 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.example.dailyrecipes.model.day.DayFactory;
-import com.example.dailyrecipes.model.ingredients.IngredientsFactory;
-import com.example.dailyrecipes.model.recipe.RecipesFactory;
-import com.example.dailyrecipes.model.unit.UnitsFactory;
+import com.example.dailyrecipes.model.DayFactory;
+import com.example.dailyrecipes.model.IngredientsFactory;
+import com.example.dailyrecipes.model.RecipesFactory;
+import com.example.dailyrecipes.model.UnitsFactory;
 import com.example.dailyrecipes.utils.ConnectionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
-    public static AppCompatActivity instance;
+    public static RecipesFactory recipesFactory;
+    public static MainActivity instance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         instance = this;
+        ConnectionManager connection = new ViewModelProvider(this).get(ConnectionManager.class);
+        //connection.connect("192.168.2.1", 5500);
+        connection.connect("192.168.42.35", 5500);
+        recipesFactory = new RecipesFactory(connection);
+
         setContentView(R.layout.activity_main);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -35,12 +41,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController((BottomNavigationView) findViewById(R.id.nav_view), navController);
 
 
-        ConnectionManager connection = new ViewModelProvider(this).get(ConnectionManager.class);
-        connection.connect("192.168.2.1", 5500);
-        RecipesFactory.instance.ConnectFactory(connection);
-        IngredientsFactory.instance.ConnectFactory(connection);
-        UnitsFactory.instance.ConnectFactory(connection);
-        DayFactory.instance.ConnectFactory(connection);
+
     }
 
     @Override

@@ -7,7 +7,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.dailyrecipes.databinding.FragmentShoppingListItemBinding;
-import com.example.dailyrecipes.model.ingredients.Ingredient;
+import com.example.dailyrecipes.model.Ingredient;
 
 import java.util.List;
 
@@ -16,10 +16,18 @@ import java.util.List;
  */
 public class IngredientsRecyclerViewAdapter extends RecyclerView.Adapter<IngredientsRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Ingredient> mValues;
+    private List<Ingredient> ingredients;
 
     public IngredientsRecyclerViewAdapter(List<Ingredient> items) {
-        mValues = items;
+        ingredients = items;
+    }
+
+    public List<Ingredient> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(List<Ingredient> ingredients) {
+        this.ingredients = ingredients;
     }
 
     @Override
@@ -31,28 +39,26 @@ public class IngredientsRecyclerViewAdapter extends RecyclerView.Adapter<Ingredi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText((int) mValues.get(position).getId());
-        holder.mNameView.setText(mValues.get(position).getName());
-        holder.mQuantityView.setText((int) mValues.get(position).getQuantity());
+        holder.mUnitView.setText(String.valueOf(ingredients.get(position).getUnit().getSymbol()));
+        holder.mNameView.setText(String.valueOf(ingredients.get(position).getName()));
+        holder.mQuantityView.setText(String.valueOf(ingredients.get(position).getQuantity()));
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return ingredients.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public final TextView mIdView;
         public final TextView mNameView;
         public final TextView mQuantityView;
-        public Ingredient mItem;
+        public final TextView mUnitView;
 
         public ViewHolder(FragmentShoppingListItemBinding binding) {
             super(binding.getRoot());
-            mIdView = binding.itemNumber;
             mNameView = binding.nameTv;
-            mQuantityView = binding.quantityEt;
+            mQuantityView = binding.quantityTv;
+            mUnitView = binding.unitTv;
         }
 
         @Override

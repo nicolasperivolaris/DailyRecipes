@@ -48,17 +48,6 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="TextContrastCheck" />
 
-                <ImageView
-                    android:id="@+id/recipe_img"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:contentDescription="@string/image_of_the_recipe"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/edit_sw"
-                    app:layout_constraintStart_toEndOf="@+id/recipeName_et"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/nofile" />
-
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/edit_sw"
                     android:layout_width="wrap_content"
@@ -99,6 +88,13 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <ImageView
+                android:id="@+id/recipe_img"
+                android:layout_width="wrap_content"
+                android:layout_height="160dp"
+                android:contentDescription="@string/image_of_the_recipe"
+                app:srcCompat="@drawable/nofile" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/content"

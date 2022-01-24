@@ -14,6 +14,7 @@ import java.util.Map;
 public class PositionedMap<T extends ItemModel>{
     private final LinkedList<Integer> keysPositions = new LinkedList<>();
     private final HashMap<Integer, T> items;
+    private boolean locked = false;
 
     public PositionedMap(){
         items = new HashMap<>();
@@ -62,6 +63,7 @@ public class PositionedMap<T extends ItemModel>{
     }
 
     public T replace(int position, T newValue){
+        if(locked) throw new RuntimeException("Locked collection");
         if(items.containsKey(newValue.getId()))return null;
         Integer id = keysPositions.remove(position);
         items.remove(id);
@@ -71,6 +73,7 @@ public class PositionedMap<T extends ItemModel>{
 
     @Nullable
     public T put(Integer key, T value){
+        if(locked) throw new RuntimeException("Locked collection");
         if(items.containsKey(value.getId()))return null;
         if(items.containsKey(value)){
             return null;
@@ -81,6 +84,7 @@ public class PositionedMap<T extends ItemModel>{
 
     @Nullable
     public T put(int position, T value){
+        if(locked) throw new RuntimeException("Locked collection");
         if(items.containsKey(value.getId()))return null;
         if(items.containsKey(value)){
             return null;
@@ -96,13 +100,23 @@ public class PositionedMap<T extends ItemModel>{
 
     @Nullable
     public T remove(@Nullable Object key) {
+        if(locked) throw new RuntimeException("Locked collection");
         keysPositions.remove(key);
         return items.remove(key);
     }
 
     @Nullable
     public T remove(int position) {
+        if(locked) throw new RuntimeException("Locked collection");
         Integer id = keysPositions.remove(position);
         return items.remove(id);
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 }

@@ -21,15 +21,13 @@ import androidx.navigation.Navigation;
 
 import com.example.dailyrecipes.MainActivity;
 import com.example.dailyrecipes.R;
-import com.example.dailyrecipes.model.day.Day;
-import com.example.dailyrecipes.model.day.DayFactory;
-import com.example.dailyrecipes.model.recipe.Recipe;
-import com.example.dailyrecipes.model.recipe.RecipesFactory;
+import com.example.dailyrecipes.model.Day;
+import com.example.dailyrecipes.model.Recipe;
+import com.example.dailyrecipes.model.RecipesFactory;
 import com.example.dailyrecipes.queries.recipes.UpdateDayQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
 import com.example.dailyrecipes.utils.PositionedMap;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -37,12 +35,13 @@ public class RecipeListFragment extends Fragment {
     private final static String TAG = "HomeFragment";
     private View view;
     private LayoutInflater inflater;
+    private final RecipesFactory recipesFactory = MainActivity.recipesFactory;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_recipe_list, container, false);
         this.inflater = inflater;
-        RecipesFactory.instance.addObserver((o, arg) -> setRecipeList(((HashMap<Integer, Recipe>) arg).values()));
+        recipesFactory.addObserver((o, arg) -> setRecipeList(((HashMap<Integer, Recipe>) arg).values()));
 
         view.findViewById(R.id.add_bt).setOnClickListener(v -> {
             Bundle bundle = new Bundle();
@@ -55,18 +54,14 @@ public class RecipeListFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        RecipesFactory factory = RecipesFactory.instance;
-        factory.update();
-        setRecipeList(factory.getDataList().values());
+        //recipesFactory.update();
+        setRecipeList(recipesFactory.getDataList().values());
     }
 
     private void setRecipeList(Collection<Recipe> recipeList) {
-        if(recipeList == null) recipeList = new ArrayList<>();
-        Collection<Recipe> finalRecipeList = recipeList;
-
         MainActivity.instance.runOnUiThread(() -> {
-            Recipe[] recipes = new Recipe[finalRecipeList.size()];
-            recipes = finalRecipeList.toArray(recipes);
+            Recipe[] recipes = new Recipe[recipeList.size()];
+            recipes = recipeList.toArray(recipes);
             GridView recipesLV = view.findViewById(R.id.recipe_list);
             recipesLV.setAdapter(new RecipeListAdapter(recipes));
         });
@@ -125,7 +120,7 @@ public class RecipeListFragment extends Fragment {
         private void createDayListDialog(Recipe recipe){
             AlertDialog.Builder builder = new AlertDialog.Builder(inflater.getContext());
             builder.setTitle("Choose a day");
-            PositionedMap<Day> days = DayFactory.instance.getDataList();
+            PositionedMap<Day> days = recipesFactory.getDayFactory().getDataList();
             String[] values = new String[days.size()];
             int i = 0;
             for (Day d : days.values()) {

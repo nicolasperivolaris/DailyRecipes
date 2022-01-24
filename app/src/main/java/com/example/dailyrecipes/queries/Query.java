@@ -33,7 +33,9 @@ public abstract class Query<Param, Result> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Thread t = new Thread(() -> listener.dataReceived(getData()));
+        Thread t = new Thread(() ->
+                listener.dataReceived(getData())
+        );
         t.start();
     }
 
@@ -106,7 +108,8 @@ public abstract class Query<Param, Result> {
         GET_INGREDIENT_LIST(6),
         GET_UNIT_LIST(7),
         GET_DAY_LIST(8),
-        SET_DAY_RECIPE(9);
+        SET_DAY_RECIPE(9),
+        GET_RECIPE_AND_ALL(10);
         public final int id;
         Flag(int i){
             id = i;

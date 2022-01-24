@@ -13,16 +13,18 @@ import java.util.Map;
 import java.util.Observable;
 
 public abstract class QueryableFactory<T extends ItemModel> extends Observable {
-    private static ConnectionManager connection;
+    protected ConnectionManager connection;
     protected PositionedMap<T> dataList = new PositionedMap<>();
+    protected boolean loaded = false;
+    private Thread connectionThread;
 
-    public void ConnectFactory(ConnectionManager connectionManager){
+    protected QueryableFactory(ConnectionManager connectionManager){
         connection = connectionManager;
         update();
     }
 
     public void update(){
-        connection.make(new ListQuery<T>(this, this::SetList));
+        connectionThread = connection.make(new ListQuery<T>(this, this::SetList));
     }
 
     public abstract Query.Flag getFlag();
@@ -37,19 +39,37 @@ public abstract class QueryableFactory<T extends ItemModel> extends Observable {
 
     private void SetList(Map<Integer, T> list){
         dataList = new PositionedMap<>(list);
+        loaded = true;
         setChanged();
         notifyObservers(list);
+    }
+
+    public boolean isLoaded() {
+        return loaded;
     }
 
     public void Add(T t){
         connection.make(new AddQuery<>(t, i -> {}));
     }
 
-    public void Update(T T){
-
+    public Thread getConnectionThread() {
+        return connectionThread;
     }
 
-    public void Delete(T T){
-
+    protected void wait(QueryableFactory<?> factory){
+        while(!factory.isLoaded()) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if(factory.getConnectionThread().isAlive()) {
+            try {
+                factory.getConnectionThread().join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

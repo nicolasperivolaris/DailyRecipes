@@ -1,15 +1,17 @@
-package com.example.dailyrecipes.model.day;
+package com.example.dailyrecipes.model;
 
+import com.example.dailyrecipes.model.Day;
 import com.example.dailyrecipes.model.QueryableFactory;
 import com.example.dailyrecipes.queries.Query;
+import com.example.dailyrecipes.utils.ConnectionManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DayFactory extends QueryableFactory<Day> {
-
-    public static DayFactory instance = new DayFactory();
-    private DayFactory(){};
+    public DayFactory(ConnectionManager connectionManager){
+        super(connectionManager);
+    };
 
     @Override
     public Query.Flag getFlag() {

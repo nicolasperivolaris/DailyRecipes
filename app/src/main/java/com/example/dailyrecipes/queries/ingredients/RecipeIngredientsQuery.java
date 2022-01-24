@@ -2,9 +2,9 @@ package com.example.dailyrecipes.queries.ingredients;
 
 import static com.example.dailyrecipes.queries.Query.Flag.GET_RECIPE_INGREDIENTS;
 
-import com.example.dailyrecipes.model.ingredients.Ingredient;
-import com.example.dailyrecipes.model.ingredients.IngredientsFactory;
-import com.example.dailyrecipes.model.recipe.Recipe;
+import com.example.dailyrecipes.model.Ingredient;
+import com.example.dailyrecipes.model.IngredientsFactory;
+import com.example.dailyrecipes.model.Recipe;
 import com.example.dailyrecipes.queries.Query;
 
 import org.json.JSONArray;
@@ -24,7 +24,7 @@ public class RecipeIngredientsQuery extends Query<Void, Recipe> {
 
         JSONArray array = new JSONArray(json);
         for (int i = 0; i < array.length(); i++) {
-            ingredients.add(IngredientsFactory.instance.convertJSON(array.getJSONObject(i)));
+            //ingredients.add(IngredientsFactory.instance.convertJSON(array.getJSONObject(i)));
         }
         getData().setIngredients(ingredients);
 

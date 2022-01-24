@@ -1,4 +1,4 @@
-package com.example.dailyrecipes.model.recipe;
+package com.example.dailyrecipes.model;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -6,9 +6,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.example.dailyrecipes.model.ItemModel;
-import com.example.dailyrecipes.model.day.Day;
-import com.example.dailyrecipes.model.ingredients.Ingredient;
 import com.example.dailyrecipes.utils.PositionedMap;
 
 import org.json.JSONArray;
@@ -46,7 +43,7 @@ public class Recipe extends ItemModel implements Parcelable{
     Recipe(int id, String name, String description, List<Ingredient> ingredients, int multiplier, String imageName, Day day) {
         this(id, name, description, new PositionedMap<>(), multiplier, imageName,day);
         for (Ingredient i:ingredients) {
-            this.ingredients.put(i.id, i);
+            this.ingredients.put(i.getId(), i);
         }
     }
 
@@ -147,7 +144,7 @@ public class Recipe extends ItemModel implements Parcelable{
 
     public void setIngredients(List<Ingredient> ingredients){
         for (Ingredient i:ingredients) {
-            this.ingredients.put(i.id, i);
+            this.ingredients.put(i.getId(), i);
         }
     }
 
