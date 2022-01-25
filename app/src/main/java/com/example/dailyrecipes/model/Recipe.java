@@ -28,7 +28,7 @@ public class Recipe extends ItemModel implements Parcelable{
 
     Recipe(){
         super(0, "");
-        day = null;
+        day = Day.NOT_DAY;
     }
 
     Recipe(int id, String name, String description, PositionedMap<Ingredient> ingredients, int multiplier, String imageName, Day day) {

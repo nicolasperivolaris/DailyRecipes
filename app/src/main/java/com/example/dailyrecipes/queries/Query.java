@@ -101,7 +101,7 @@ public abstract class Query<Param, Result> {
     public enum Flag{
         GET_RECIPE_LIST(0),
         GET_RECIPE_INGREDIENTS(1),
-        ADD_INGREDIENT(2),
+        SAVE_INGREDIENT(2),
         DELETE_INGREDIENT(3),
         GET_SHOPPING_LIST(4),
         SAVE_RECIPE(5),

@@ -1,19 +1,20 @@
 package com.example.dailyrecipes.queries.ingredients;
 
-import static com.example.dailyrecipes.queries.Query.Flag.ADD_INGREDIENT;
+import static com.example.dailyrecipes.queries.Query.Flag.SAVE_INGREDIENT;
 
+import com.example.dailyrecipes.model.Ingredient;
 import com.example.dailyrecipes.model.ItemModel;
 import com.example.dailyrecipes.queries.Query;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class AddQuery<I extends ItemModel> extends Query<I, Void> {
+public class SaveIngredientQuery extends Query<Ingredient, Void> {
 
-    private I i;
+    private Ingredient i;
 
-    public AddQuery(I i, QueryListener<Void> callback) {
-        super(callback,ADD_INGREDIENT);
+    public SaveIngredientQuery(Ingredient i, QueryListener<Void> callback) {
+        super(callback, SAVE_INGREDIENT);
         this.i = i;
     }
 

@@ -15,6 +15,10 @@ public class Ingredient extends ItemModel implements Parcelable{
     private float quantity;
     public static final Ingredient EMPTY = new Ingredient(0, "", Unit.EMPTY, 0);
 
+    Ingredient(){
+        super(0, "");
+    }
+
     Ingredient(int id, String name, Unit unit, float quantity) {
         super(id, name);
         this.unit = unit;
@@ -61,7 +65,8 @@ public class Ingredient extends ItemModel implements Parcelable{
         result.accumulate("Id", id);
         result.accumulate("Name", name);
         result.accumulate("Quantity", quantity);
-        result.accumulate("Unit", unit.convertToJSON());
+        if(unit != null)
+            result.accumulate("Unit", unit.convertToJSON());
         return result;
     }
 

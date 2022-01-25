@@ -2,7 +2,6 @@ package com.example.dailyrecipes.model;
 
 import com.example.dailyrecipes.queries.ListQuery;
 import com.example.dailyrecipes.queries.Query;
-import com.example.dailyrecipes.queries.ingredients.AddQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
 import com.example.dailyrecipes.utils.PositionedMap;
 
@@ -46,10 +45,6 @@ public abstract class QueryableFactory<T extends ItemModel> extends Observable {
 
     public boolean isLoaded() {
         return loaded;
-    }
-
-    public void Add(T t){
-        connection.make(new AddQuery<>(t, i -> {}));
     }
 
     public Thread getConnectionThread() {

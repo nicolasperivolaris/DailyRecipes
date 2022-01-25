@@ -1,5 +1,7 @@
 package com.example.dailyrecipes.queries;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.example.dailyrecipes.model.ItemModel;

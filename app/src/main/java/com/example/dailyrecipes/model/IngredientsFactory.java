@@ -38,5 +38,7 @@ public class IngredientsFactory extends QueryableFactory<Ingredient> {
         return new Ingredient(id, name, unit, quantity);
     }
 
-
+    public static Ingredient newInstance(){
+        return new Ingredient();
+    }
 }

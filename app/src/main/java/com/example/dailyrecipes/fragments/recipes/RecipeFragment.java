@@ -58,9 +58,6 @@ public class RecipeFragment extends Fragment {
             view.findViewById(R.id.description_et).setFocusable(false);
             view.findViewById(R.id.description_et).setFocusableInTouchMode(false);
         }
-
-        
-
         return view;
     }
 
@@ -120,7 +117,7 @@ public class RecipeFragment extends Fragment {
             ((EditText) view.findViewById(R.id.description_et)).setText(result.getDescription());
 
             LinearLayoutCompat list = view.findViewById(R.id.ingredients_list);
-            ingredientsAdapter = new IngredientsAdapter(list, getContext(), result.getIngredients(), ingredientsFactory, multiplier);
+            ingredientsAdapter = new IngredientsAdapter(list, getContext(), result.getIngredients(), ingredientsFactory, multiplier, connection);
 
         });
     }
