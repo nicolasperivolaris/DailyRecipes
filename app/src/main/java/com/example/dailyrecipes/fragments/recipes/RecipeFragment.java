@@ -53,6 +53,7 @@ public class RecipeFragment extends Fragment {
         if(getArguments() != null) {
             if (getArguments().containsKey("recipe")) {
                 recipe = (Recipe) getArguments().get("recipe");
+                multiplier = recipe.getMultiplier();
             }
             else {
                 recipe = RecipesFactory.newInstance();
@@ -139,7 +140,7 @@ public class RecipeFragment extends Fragment {
         requireActivity().runOnUiThread(() -> {
             ((EditText) view.findViewById(R.id.recipeName_et)).setText(result.getName());
             ((EditText) view.findViewById(R.id.description_et)).setText(result.getDescription());
-
+            ((TextView) view.findViewById(R.id.amount_tv)).setText(result.getMultiplier() + "");
             LinearLayoutCompat list = view.findViewById(R.id.ingredients_list);
             ingredientsAdapter = new IngredientsAdapter(list, getContext(), result.getIngredients(), ingredientsFactory, multiplier, connection);
 

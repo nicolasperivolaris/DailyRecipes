@@ -31,7 +31,7 @@ public class FillRecipesQuery extends Query<Void, List<Recipe>> {
             JSONArray line = array.getJSONArray(i);
             Integer recipe_id = line.getInt(0);
             Integer ingredient_id = line.getInt(1);
-            int quantity = line.getInt(2);
+            float quantity = (float) line.getDouble(2);
             Integer unit_id = line.getInt(3);
 
             Recipe recipe = recipesFactory.getDataList().get(recipe_id);
