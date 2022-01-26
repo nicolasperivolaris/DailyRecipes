@@ -1,5 +1,6 @@
 package com.example.dailyrecipes.fragments.recipes;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,18 +27,25 @@ import com.example.dailyrecipes.model.Recipe;
 import com.example.dailyrecipes.model.RecipesFactory;
 import com.example.dailyrecipes.queries.recipes.SaveRecipeQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
+import com.example.dailyrecipes.utils.FTPManager;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 
 public class RecipeFragment extends Fragment {
     private ConnectionManager connection;
+    private FTPManager ftpManager;
     private int multiplier = 1;
     private IngredientsAdapter ingredientsAdapter;
     private Recipe recipe;
     private ActivityResultLauncher<String> getImage;
+    private Uri tempImageUri;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.show_recipe2, container, false);
         connection = new ViewModelProvider(requireActivity()).get(ConnectionManager.class);
+        ftpManager = new ViewModelProvider(requireActivity()).get(FTPManager.class);
         initSpinner(view);
         initEditMode(view);
         initSaveButton(view);
@@ -68,7 +76,7 @@ public class RecipeFragment extends Fragment {
         getImage = registerForActivityResult(new ActivityResultContracts.GetContent(),
                 uri -> {
                     image.setImageURI(uri);
-                    recipe.setImage(uri);
+                    tempImageUri = uri;
                 });
 
         return view;
@@ -80,10 +88,12 @@ public class RecipeFragment extends Fragment {
             recipe.setDescription(((EditText)view.findViewById(R.id.description_et)).getText().toString());
             recipe.setMultiplier(Integer.parseInt(((TextView)view.findViewById(R.id.amount_tv)).getText().toString()));
             recipe.getIngredients().remove(Ingredient.EMPTY);
+            recipe.setImage(tempImageUri);
+            recipe.setImageName(new File(tempImageUri.getPath()).getName());
+            Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT).show();
             SaveRecipeQuery query = new SaveRecipeQuery(this::savedCallBack, recipe);
             connection.make(query);
-
-            Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT).show();
+            ftpManager.setFile(recipe.getImage());
         });
     }
 

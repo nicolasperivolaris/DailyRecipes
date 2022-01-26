@@ -27,6 +27,8 @@ public class Recipe extends ItemModel implements Parcelable{
     private PositionedMap<Ingredient> ingredients = new PositionedMap<>();
     private int multiplier = 1;
     private Uri image;
+    private String imageName;
+    private boolean imageFromFTP;
     private Day day;
 
 
@@ -36,7 +38,7 @@ public class Recipe extends ItemModel implements Parcelable{
         day = Day.NOT_DAY;
     }
 
-    Recipe(int id, String name, String description, PositionedMap<Ingredient> ingredients, int multiplier, Uri image, Day day) {
+    Recipe(int id, String name, String description, PositionedMap<Ingredient> ingredients, int multiplier, Uri image, String imageName, Day day) {
         super(id, name);
         this.ingredients = ingredients;
         this.description = description;
@@ -44,11 +46,12 @@ public class Recipe extends ItemModel implements Parcelable{
         if(image == null || image.toString().trim().equals(""))
             image = noImage;
         this.image = image;
+        this.imageName = imageName;
         this.day = day;
     }
 
-    Recipe(int id, String name, String description, List<Ingredient> ingredients, int multiplier, Uri image, Day day) {
-        this(id, name, description, new PositionedMap<>(), multiplier, image,day);
+    Recipe(int id, String name, String description, List<Ingredient> ingredients, int multiplier, Uri image, String imageName, Day day) {
+        this(id, name, description, new PositionedMap<>(), multiplier, image, imageName, day);
         for (Ingredient i:ingredients) {
             this.ingredients.put(i.getId(), i);
         }
@@ -62,11 +65,11 @@ public class Recipe extends ItemModel implements Parcelable{
             String description = in.readString();
             List<Ingredient> ingredients = in.readArrayList(Ingredient.class.getClassLoader());
             int multiplier = in.readInt();
+            Uri imageUri = Uri.parse(in.readString());
             String imageName = in.readString();
-            Uri.parse(imageName);
             Day day = in.readParcelable(Day.class.getClassLoader());
 
-            return new Recipe(id, name,description, ingredients, multiplier, null, day);
+            return new Recipe(id, name,description, ingredients, multiplier, imageUri, imageName, day);
         }
 
         @Override
@@ -82,7 +85,7 @@ public class Recipe extends ItemModel implements Parcelable{
         result.accumulate("Name", name);
         result.accumulate("Description", description);
         result.accumulate("Multiplier", multiplier);
-        result.accumulate("ImagePath", image.toString());
+        result.accumulate("ImagePath", imageName);
         JSONArray ingredients = new JSONArray();
         for (Ingredient i : this.ingredients.values())
             ingredients.put(i.convertToJSON());
@@ -140,6 +143,7 @@ public class Recipe extends ItemModel implements Parcelable{
         dest.writeTypedList(new ArrayList<>(ingredients.values()));
         dest.writeInt(multiplier);
         dest.writeString(image.toString());
+        dest.writeString(imageName);
         if(day == null)
             dest.writeInt(-1);
         else
@@ -169,9 +173,25 @@ public class Recipe extends ItemModel implements Parcelable{
         return image;
     }
 
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
+
     public void setImage(Uri image) {
         if(image != null)
             this.image = image;
         else this.image = noImage;
+    }
+
+    public boolean isImageFromFTP() {
+        return imageFromFTP;
+    }
+
+    public void setImageFromFTP(boolean imageFromFTP) {
+        this.imageFromFTP = imageFromFTP;
     }
 }

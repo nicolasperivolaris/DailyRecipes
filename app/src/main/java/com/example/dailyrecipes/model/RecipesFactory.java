@@ -2,9 +2,13 @@ package com.example.dailyrecipes.model;
 
 import android.net.Uri;
 
+import androidx.lifecycle.ViewModelProvider;
+
+import com.example.dailyrecipes.MainActivity;
 import com.example.dailyrecipes.queries.Query;
 import com.example.dailyrecipes.queries.recipes.FillRecipesQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
+import com.example.dailyrecipes.utils.FTPManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,7 +73,7 @@ public class RecipesFactory extends QueryableFactory<Recipe> {
         String description = jsonObject.getString("Description");
         int multiplier = jsonObject.getInt("Multiplier");
         String imageName = jsonObject.getString("ImagePath");
-        Uri image = Uri.parse(Uri.decode(imageName));
+        Uri img = (new ViewModelProvider(MainActivity.instance).get(FTPManager.class)).getFile(imageName);
         ArrayList<Ingredient> ingredients = new ArrayList<>();
         if (!jsonObject.isNull("Ingredients")){
             JSONArray array = jsonObject.getJSONArray("Ingredients");
@@ -78,7 +82,7 @@ public class RecipesFactory extends QueryableFactory<Recipe> {
         }
         Day day = dayFactory.convertJSON(jsonObject.getJSONObject("Day"));
 
-        return new Recipe(id, name,description, ingredients,multiplier, image, day);
+        return new Recipe(id, name,description, ingredients,multiplier, img, imageName, day);
     }
 
     public static Recipe newInstance(){

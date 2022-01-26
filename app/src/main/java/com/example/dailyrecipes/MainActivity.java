@@ -13,7 +13,10 @@ import com.example.dailyrecipes.model.IngredientsFactory;
 import com.example.dailyrecipes.model.RecipesFactory;
 import com.example.dailyrecipes.model.UnitsFactory;
 import com.example.dailyrecipes.utils.ConnectionManager;
+import com.example.dailyrecipes.utils.FTPManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     public static RecipesFactory recipesFactory;
@@ -25,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
         instance = this;
         ConnectionManager connection = new ViewModelProvider(this).get(ConnectionManager.class);
         connection.connect("192.168.0.33", 5500);
+        FTPManager ftpManager = new ViewModelProvider(this).get(FTPManager.class);
+        ftpManager.connect("192.168.0.23", "admin", "Isib1111");
         recipesFactory = new RecipesFactory(connection);
 
         setContentView(R.layout.activity_main);
@@ -38,9 +43,16 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = navHostFragment.getNavController();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController((BottomNavigationView) findViewById(R.id.nav_view), navController);
+    }
 
-
-
+    @Override
+    protected void onDestroy() {
+        try {
+            new ViewModelProvider(this).get(FTPManager.class).disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        super.onDestroy();
     }
 
     @Override

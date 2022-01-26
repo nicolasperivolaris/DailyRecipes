@@ -23,6 +23,7 @@ import com.example.dailyrecipes.model.Recipe;
 import com.example.dailyrecipes.model.RecipesFactory;
 import com.example.dailyrecipes.queries.recipes.UpdateDayQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
+import com.example.dailyrecipes.utils.FTPManager;
 import com.example.dailyrecipes.utils.PositionedMap;
 
 import java.util.Collection;
@@ -99,14 +100,11 @@ public class RecipeListFragment extends Fragment {
 
             Thread t = new Thread(() -> {
                 Recipe recipe = data[position];
-                Uri img = recipe.getImage();
-                //Drawable image = img == null ? ResourcesCompat.getDrawable(getResources(), R.drawable.nofile, requireActivity().getTheme())
-                  //      : new BitmapDrawable(getResources(), img);
                 requireActivity().runOnUiThread(() -> {
                     ((TextView)item.findViewById(R.id.name_tv)).setText(recipe.getName());
                     ImageView image = (ImageView) item.findViewById(R.id.recipe_img);
                     try {
-                        image.setImageURI(img);
+                        image.setImageURI(recipe.getImage());
                     }catch (Exception e){ image.setImageURI(Recipe.noImage);}
                     image.setOnClickListener(v -> {
                         Bundle bundle = new Bundle();
