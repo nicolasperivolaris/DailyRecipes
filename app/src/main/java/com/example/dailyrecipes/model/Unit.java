@@ -6,9 +6,11 @@ import android.os.Parcelable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 public class Unit extends ItemModel implements Parcelable{
     public static final Unit EMPTY = new Unit(0, "", "");
-    private String symbol;
+    private String symbol = "";
 
     Unit(int id, String name, String symbol) {
         super(id, name);
@@ -59,6 +61,28 @@ public class Unit extends ItemModel implements Parcelable{
         dest.writeInt(id);
         dest.writeString(name);
         dest.writeString(symbol);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Unit unit = (Unit) o;
+        return id.equals(unit.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Unit{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", symbol='" + symbol + '\'' +
+                '}';
     }
 }
 

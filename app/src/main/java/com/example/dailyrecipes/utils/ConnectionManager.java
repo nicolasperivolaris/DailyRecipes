@@ -19,7 +19,7 @@ public class ConnectionManager extends ViewModel {
     private BufferedReader input;
     private PrintWriter output;
     private boolean sending;
-    private final Hashtable<Integer, Query<?, ?>> queries;
+    private final Hashtable<Integer, QueryHandler> queries;
 
     public ConnectionManager() {
         queries = new Hashtable<>();
@@ -34,6 +34,7 @@ public class ConnectionManager extends ViewModel {
                 output = new PrintWriter(socket.getOutputStream());
                 sending=false;
                 while (socket.isConnected() && !socket.isClosed()) {
+                    Log.i("Connection Manager", "Listening...");
                     try {
                         formatResponse();
                     } catch (IOException e) {
@@ -44,6 +45,7 @@ public class ConnectionManager extends ViewModel {
                         e.printStackTrace();
                     }
                 }
+                Log.i("Connection Manager", "Socket close");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -51,19 +53,23 @@ public class ConnectionManager extends ViewModel {
         thread.start();
     }
 
-    private Query<?, ?> formatResponse() throws IOException, NumberFormatException {
+    private void formatResponse() throws IOException, NumberFormatException {
         String line = input.readLine();
+        Log.i("Connection Manager", "Receiving : " + line);
         String queryIdString = line.split("\t")[0];
-        Query<?, ?> q = queries.get(Integer.parseInt(queryIdString));
+        Query<?, ?> q = queries.get(Integer.parseInt(queryIdString)).query;
+        Log.i("Connection Manager", "working... " );
         if (q != null) {
             q.setJSONData(line.substring(queryIdString.length()));
             queries.remove(q.id);
         }
-        return q;
     }
 
-    public void askServer(Query query) {
-        queries.put(query.id, query);
+    public void askServer(Query<?,?> query) {
+        QueryHandler queryHandler = new QueryHandler();
+        queryHandler.query = query;
+        queryHandler.tsSend = System.currentTimeMillis();
+        queries.put(query.id, queryHandler);
         Thread t = new Thread(() -> {
             boolean done = false;
             while (!done) {
@@ -72,6 +78,7 @@ public class ConnectionManager extends ViewModel {
                     query.print(output);
                     sending = false;
                     done = true;
+                    Log.i("Connection Manager", query.id + " done. Flag :" + query.getFlag());
                 }
                 try {
                     Thread.sleep(100);
@@ -106,5 +113,11 @@ public class ConnectionManager extends ViewModel {
 
     public boolean isReady() {
         return socket != null && socket.isConnected();
+    }
+
+    private class QueryHandler{
+        Query query;
+        long tsSend;
+        boolean finished;
     }
 }

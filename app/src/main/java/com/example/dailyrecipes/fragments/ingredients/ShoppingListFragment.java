@@ -22,6 +22,7 @@ import com.example.dailyrecipes.utils.ConnectionManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * A fragment representing a list of Items.
@@ -65,11 +66,12 @@ public class ShoppingListFragment extends Fragment {
 
         HashMap<PairIdUnit, Ingredient> ingredientList = new HashMap<>();
 
+        //add only ingredients for planned recipes
         for (Recipe recipe: MainActivity.recipesFactory.getDataList().values()) {
             if(recipe.getDay().equals(Day.NOT_DAY)) continue;
             for (Ingredient i: recipe.getIngredients().values()) {
                 Ingredient temp = ingredientList.get(new PairIdUnit(i.getId(), i.getUnit()));
-                if(temp !=null //if ingredientList contains i
+                if(temp !=null //if ingredientList contains same ingredient from other recipe
                         && temp.getUnit().equals(i.getUnit())) temp.setQuantity(temp.getQuantity() + i.getQuantity());
                 else ingredientList.put(new PairIdUnit(i.getId(), i.getUnit()), i);
             }
@@ -95,6 +97,19 @@ public class ShoppingListFragment extends Fragment {
         PairIdUnit(Integer id, Unit unit){
             this.id = id;
             this.unit = unit;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            PairIdUnit that = (PairIdUnit) o;
+            return Objects.equals(id, that.id) && Objects.equals(unit, that.unit);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id, unit);
         }
     }
 }

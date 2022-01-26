@@ -13,6 +13,18 @@ public class IngredientsFactory extends QueryableFactory<Ingredient> {
         unitsFactory = new UnitsFactory(connectionManager);
     }
 
+    @Override
+    public void update() {
+        if(!unitsFactory.isLoaded())
+            unitsFactory.update();
+        super.update();
+    }
+
+    @Override
+    protected void waitDependencies() {
+        wait(unitsFactory);
+    }
+
     public UnitsFactory getUnitsFactory() {
         return unitsFactory;
     }
@@ -30,15 +42,18 @@ public class IngredientsFactory extends QueryableFactory<Ingredient> {
         return ingredientsNames;
     }
 
+    @Override
+    protected void onUpdated() {}
+
     public Ingredient convertJSON(JSONObject jsonObject) throws JSONException {
         int id = jsonObject.getInt("Id");
         String name = jsonObject.getString("Name");
         float quantity = (float) jsonObject.getDouble("Quantity");
-        Unit unit = unitsFactory.convertJSON(jsonObject.getJSONObject("Unit"));
+        Unit unit = Unit.EMPTY;
         return new Ingredient(id, name, unit, quantity);
     }
 
-    public static Ingredient newInstance(){
-        return new Ingredient();
+    public static Ingredient newInstance(String name, Unit unit){
+        return new Ingredient(0, name, unit,0);
     }
 }

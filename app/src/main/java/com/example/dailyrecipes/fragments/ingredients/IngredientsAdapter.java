@@ -150,7 +150,7 @@ public class IngredientsAdapter extends BaseAdapter {
     private void createIngredientCreationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Create an ingredient");
-        Ingredient newIngredient = IngredientsFactory.newInstance();
+        Ingredient newIngredient = IngredientsFactory.newInstance("", ingredientsFactory.getUnitsFactory().getDataList().get(0));
         View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_new_ingredient, null, false);
         builder.setView(dialogView);
         builder.setNegativeButton("Cancel",(dialog, which) -> dialog.dismiss());

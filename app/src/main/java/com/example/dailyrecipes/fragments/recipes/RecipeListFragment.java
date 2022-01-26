@@ -1,9 +1,7 @@
 package com.example.dailyrecipes.fragments.recipes;
 
 import android.app.AlertDialog;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -54,8 +51,13 @@ public class RecipeListFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        //recipesFactory.update();
         setRecipeList(recipesFactory.getDataList().values());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        recipesFactory.update();
     }
 
     private void setRecipeList(Collection<Recipe> recipeList) {
@@ -97,13 +99,16 @@ public class RecipeListFragment extends Fragment {
 
             Thread t = new Thread(() -> {
                 Recipe recipe = data[position];
-                Bitmap img = recipe.getImage();
-                Drawable image = img == null ? ResourcesCompat.getDrawable(getResources(), R.drawable.nofile, requireActivity().getTheme())
-                        : new BitmapDrawable(getResources(), img);
+                Uri img = recipe.getImage();
+                //Drawable image = img == null ? ResourcesCompat.getDrawable(getResources(), R.drawable.nofile, requireActivity().getTheme())
+                  //      : new BitmapDrawable(getResources(), img);
                 requireActivity().runOnUiThread(() -> {
-                    ((ImageView)item.findViewById(R.id.recipe_img)).setImageDrawable(image);
                     ((TextView)item.findViewById(R.id.name_tv)).setText(recipe.getName());
-                    item.findViewById(R.id.recipe_img).setOnClickListener(v -> {
+                    ImageView image = (ImageView) item.findViewById(R.id.recipe_img);
+                    try {
+                        image.setImageURI(img);
+                    }catch (Exception e){ image.setImageURI(Recipe.noImage);}
+                    image.setOnClickListener(v -> {
                         Bundle bundle = new Bundle();
                         bundle.putParcelable("recipe", data[position]);
                         bundle.putBoolean("editable", false);

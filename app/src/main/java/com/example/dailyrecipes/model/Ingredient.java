@@ -15,10 +15,6 @@ public class Ingredient extends ItemModel implements Parcelable{
     private float quantity;
     public static final Ingredient EMPTY = new Ingredient(0, "", Unit.EMPTY, 0);
 
-    Ingredient(){
-        super(0, "");
-    }
-
     Ingredient(int id, String name, Unit unit, float quantity) {
         super(id, name);
         this.unit = unit;
@@ -100,5 +96,14 @@ public class Ingredient extends ItemModel implements Parcelable{
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Ingredient{" +
+                "name=" + name +
+                "unit=" + unit +
+                ", quantity=" + quantity +
+                '}';
     }
 }

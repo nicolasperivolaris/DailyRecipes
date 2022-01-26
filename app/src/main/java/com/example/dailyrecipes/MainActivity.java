@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
         instance = this;
         ConnectionManager connection = new ViewModelProvider(this).get(ConnectionManager.class);
         connection.connect("192.168.0.33", 5500);
-        //connection.connect("192.168.42.35", 5500);
         recipesFactory = new RecipesFactory(connection);
 
         setContentView(R.layout.activity_main);

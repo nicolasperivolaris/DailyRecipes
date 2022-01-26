@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 public abstract class ItemModel {
     protected Integer id;
-    protected String name;
+    protected String name = "";
 
     public ItemModel(Integer id, String name) {
         this.id = id;

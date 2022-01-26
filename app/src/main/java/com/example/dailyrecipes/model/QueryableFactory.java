@@ -1,5 +1,7 @@
 package com.example.dailyrecipes.model;
 
+import android.util.Log;
+
 import com.example.dailyrecipes.queries.ListQuery;
 import com.example.dailyrecipes.queries.Query;
 import com.example.dailyrecipes.utils.ConnectionManager;
@@ -8,6 +10,7 @@ import com.example.dailyrecipes.utils.PositionedMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Observable;
 
@@ -19,12 +22,21 @@ public abstract class QueryableFactory<T extends ItemModel> extends Observable {
 
     protected QueryableFactory(ConnectionManager connectionManager){
         connection = connectionManager;
-        update();
     }
 
     public void update(){
-        connectionThread = connection.make(new ListQuery<T>(this, this::SetList));
+        loaded = false;
+        QueryableFactory instance = this;
+        Thread t = new Thread(() -> {
+            waitDependencies();
+            connectionThread = connection.make(new ListQuery<T>(instance, list -> instance.SetList(list)));
+            instance.wait(instance);
+            onUpdated();
+        });
+        t.start();
     }
+    protected abstract void onUpdated();
+    protected abstract void waitDependencies();
 
     public abstract Query.Flag getFlag();
 
@@ -40,6 +52,10 @@ public abstract class QueryableFactory<T extends ItemModel> extends Observable {
         dataList = new PositionedMap<>(list);
         loaded = true;
         setChanged();
+        Iterator<Integer> i = list.keySet().iterator();
+        while (i.hasNext()) {
+            Log.i("QueryableFactory",list.get(i.next()).toString());
+        }
         notifyObservers(list);
     }
 
@@ -52,19 +68,20 @@ public abstract class QueryableFactory<T extends ItemModel> extends Observable {
     }
 
     protected void wait(QueryableFactory<?> factory){
-        while(!factory.isLoaded()) {
+        long tsStart = System.currentTimeMillis();
+        while(!factory.isLoaded() && System.currentTimeMillis() - tsStart < 10000) {
             try {
                 Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        if(factory.getConnectionThread().isAlive()) {
+        /*if(factory.connectionThread.isAlive()) {
             try {
-                factory.getConnectionThread().join();
+                factory.connectionThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 }

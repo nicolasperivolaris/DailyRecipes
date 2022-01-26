@@ -11,7 +11,13 @@ import org.json.JSONObject;
 public class DayFactory extends QueryableFactory<Day> {
     public DayFactory(ConnectionManager connectionManager){
         super(connectionManager);
-    };
+    }
+
+    @Override
+    protected void waitDependencies() {}
+
+    @Override
+    protected void onUpdated() {}
 
     @Override
     public Query.Flag getFlag() {

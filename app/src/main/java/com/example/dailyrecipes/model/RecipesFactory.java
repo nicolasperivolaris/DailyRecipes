@@ -1,7 +1,9 @@
 package com.example.dailyrecipes.model;
 
+import android.net.Uri;
+
 import com.example.dailyrecipes.queries.Query;
-import com.example.dailyrecipes.queries.recipes.FillRecipeQuery;
+import com.example.dailyrecipes.queries.recipes.FillRecipesQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
 
 import org.json.JSONArray;
@@ -9,7 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class RecipesFactory extends QueryableFactory<Recipe> {
     private final IngredientsFactory ingredientsFactory;
@@ -20,11 +21,26 @@ public class RecipesFactory extends QueryableFactory<Recipe> {
         ingredientsFactory = new IngredientsFactory(connectionManager);
         dayFactory = new DayFactory(connectionManager);
 
-        wait(this);
-        wait(ingredientsFactory);
+        dayFactory.update();
+        ingredientsFactory.update();
+        update();
+    }
+
+    @Override
+    public void update() {
+        super.update();
+    }
+
+    @Override
+    protected void onUpdated() {
+        connection.make(new FillRecipesQuery(recipes -> {}, this));
+    }
+
+    @Override
+    protected void waitDependencies() {
         wait(dayFactory);
-        connection.make(new FillRecipeQuery(recipes -> {}, this));
-    };
+        wait(ingredientsFactory);
+    }
 
     public IngredientsFactory getIngredientsFactory() {
         return ingredientsFactory;
@@ -53,7 +69,7 @@ public class RecipesFactory extends QueryableFactory<Recipe> {
         String description = jsonObject.getString("Description");
         int multiplier = jsonObject.getInt("Multiplier");
         String imageName = jsonObject.getString("ImagePath");
-
+        Uri image = Uri.parse(Uri.decode(imageName));
         ArrayList<Ingredient> ingredients = new ArrayList<>();
         if (!jsonObject.isNull("Ingredients")){
             JSONArray array = jsonObject.getJSONArray("Ingredients");
@@ -62,7 +78,7 @@ public class RecipesFactory extends QueryableFactory<Recipe> {
         }
         Day day = dayFactory.convertJSON(jsonObject.getJSONObject("Day"));
 
-        return new Recipe(id, name,description, ingredients,multiplier, imageName, day);
+        return new Recipe(id, name,description, ingredients,multiplier, image, day);
     }
 
     public static Recipe newInstance(){

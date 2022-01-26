@@ -2,10 +2,12 @@ package com.example.dailyrecipes.model;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.example.dailyrecipes.R;
 import com.example.dailyrecipes.utils.PositionedMap;
 
 import org.json.JSONArray;
@@ -20,28 +22,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Recipe extends ItemModel implements Parcelable{
+    public final static Uri noImage = Uri.parse("android.resource://com.example.dailyrecipes/" + R.drawable.nofile);
     private String description;
     private PositionedMap<Ingredient> ingredients = new PositionedMap<>();
     private int multiplier = 1;
-    private String imageName;
+    private Uri image;
     private Day day;
+
 
     Recipe(){
         super(0, "");
+        image = noImage;
         day = Day.NOT_DAY;
     }
 
-    Recipe(int id, String name, String description, PositionedMap<Ingredient> ingredients, int multiplier, String imageName, Day day) {
+    Recipe(int id, String name, String description, PositionedMap<Ingredient> ingredients, int multiplier, Uri image, Day day) {
         super(id, name);
         this.ingredients = ingredients;
         this.description = description;
         this.multiplier = multiplier;
-        this.imageName = imageName;
+        if(image == null || image.toString().trim().equals(""))
+            image = noImage;
+        this.image = image;
         this.day = day;
     }
 
-    Recipe(int id, String name, String description, List<Ingredient> ingredients, int multiplier, String imageName, Day day) {
-        this(id, name, description, new PositionedMap<>(), multiplier, imageName,day);
+    Recipe(int id, String name, String description, List<Ingredient> ingredients, int multiplier, Uri image, Day day) {
+        this(id, name, description, new PositionedMap<>(), multiplier, image,day);
         for (Ingredient i:ingredients) {
             this.ingredients.put(i.getId(), i);
         }
@@ -56,9 +63,10 @@ public class Recipe extends ItemModel implements Parcelable{
             List<Ingredient> ingredients = in.readArrayList(Ingredient.class.getClassLoader());
             int multiplier = in.readInt();
             String imageName = in.readString();
+            Uri.parse(imageName);
             Day day = in.readParcelable(Day.class.getClassLoader());
 
-            return new Recipe(id, name,description, ingredients, multiplier, imageName, day);
+            return new Recipe(id, name,description, ingredients, multiplier, null, day);
         }
 
         @Override
@@ -74,7 +82,7 @@ public class Recipe extends ItemModel implements Parcelable{
         result.accumulate("Name", name);
         result.accumulate("Description", description);
         result.accumulate("Multiplier", multiplier);
-        result.accumulate("ImagePath", imageName);
+        result.accumulate("ImagePath", image.toString());
         JSONArray ingredients = new JSONArray();
         for (Ingredient i : this.ingredients.values())
             ingredients.put(i.convertToJSON());
@@ -105,9 +113,9 @@ public class Recipe extends ItemModel implements Parcelable{
         return ingredients;
     }
 
-    public Bitmap getImage() {
+    public Bitmap getNetImage() {
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL("http://192.168.2.8/" + imageName).openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL("http://192.168.2.8/" + "imageName").openConnection();
             connection.connect();
             InputStream input = connection.getInputStream();
             return BitmapFactory.decodeStream(input);
@@ -131,7 +139,7 @@ public class Recipe extends ItemModel implements Parcelable{
         dest.writeString(description);
         dest.writeTypedList(new ArrayList<>(ingredients.values()));
         dest.writeInt(multiplier);
-        dest.writeString(imageName);
+        dest.writeString(image.toString());
         if(day == null)
             dest.writeInt(-1);
         else
@@ -154,5 +162,16 @@ public class Recipe extends ItemModel implements Parcelable{
 
     public void setDay(Day day) {
         this.day = day;
+    }
+
+    public Uri getImage(){
+        Log.i("Recipe : ", image.toString());
+        return image;
+    }
+
+    public void setImage(Uri image) {
+        if(image != null)
+            this.image = image;
+        else this.image = noImage;
     }
 }

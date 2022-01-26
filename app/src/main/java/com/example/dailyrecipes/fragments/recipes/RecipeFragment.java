@@ -1,13 +1,17 @@
 package com.example.dailyrecipes.fragments.recipes;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
@@ -20,8 +24,6 @@ import com.example.dailyrecipes.model.Ingredient;
 import com.example.dailyrecipes.model.IngredientsFactory;
 import com.example.dailyrecipes.model.Recipe;
 import com.example.dailyrecipes.model.RecipesFactory;
-import com.example.dailyrecipes.model.UnitsFactory;
-import com.example.dailyrecipes.queries.ingredients.RecipeIngredientsQuery;
 import com.example.dailyrecipes.queries.recipes.SaveRecipeQuery;
 import com.example.dailyrecipes.utils.ConnectionManager;
 
@@ -30,6 +32,7 @@ public class RecipeFragment extends Fragment {
     private int multiplier = 1;
     private IngredientsAdapter ingredientsAdapter;
     private Recipe recipe;
+    private ActivityResultLauncher<String> getImage;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,6 +61,16 @@ public class RecipeFragment extends Fragment {
             view.findViewById(R.id.description_et).setFocusable(false);
             view.findViewById(R.id.description_et).setFocusableInTouchMode(false);
         }
+        ImageView image = view.findViewById(R.id.recipe_img);
+        Log.i("RecipeFragment", "loading : " + recipe.getImage());
+        image.setImageURI(recipe.getImage());
+        image.setOnClickListener(v -> getImage.launch("image/*"));
+        getImage = registerForActivityResult(new ActivityResultContracts.GetContent(),
+                uri -> {
+                    image.setImageURI(uri);
+                    recipe.setImage(uri);
+                });
+
         return view;
     }
 

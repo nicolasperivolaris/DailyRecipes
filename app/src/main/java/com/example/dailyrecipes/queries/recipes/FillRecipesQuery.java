@@ -17,9 +17,9 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FillRecipeQuery extends Query<Void, List<Recipe>> {
+public class FillRecipesQuery extends Query<Void, List<Recipe>> {
     private final RecipesFactory recipesFactory;
-    public FillRecipeQuery(QueryListener<List<Recipe>> run, RecipesFactory recipesFactory) {
+    public FillRecipesQuery(QueryListener<List<Recipe>> run, RecipesFactory recipesFactory) {
         super(run,GET_RECIPE_AND_ALL);
         this.recipesFactory = recipesFactory;
     }
