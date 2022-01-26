@@ -88,6 +88,7 @@ public class RecipeFragment extends Fragment {
             recipe.setDescription(((EditText)view.findViewById(R.id.description_et)).getText().toString());
             recipe.setMultiplier(Integer.parseInt(((TextView)view.findViewById(R.id.amount_tv)).getText().toString()));
             recipe.getIngredients().remove(Ingredient.EMPTY);
+            if(tempImageUri == null) tempImageUri = Recipe.noImage;
             recipe.setImage(tempImageUri);
             recipe.setImageName(new File(tempImageUri.getPath()).getName());
             Toast.makeText(getContext(), "Saving...", Toast.LENGTH_SHORT).show();

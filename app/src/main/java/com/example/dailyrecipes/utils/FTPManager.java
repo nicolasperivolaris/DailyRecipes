@@ -54,6 +54,7 @@ public class FTPManager extends ViewModel {
                 boolean result = con.retrieveFile(repository+name, out);
                 out.close();
                 if (result) Log.i("download result", "succeeded");
+                else return null;
             }
         }
         catch (Exception e)
