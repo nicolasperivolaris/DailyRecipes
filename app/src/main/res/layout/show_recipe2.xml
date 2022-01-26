@@ -96,7 +96,7 @@
                 android:contentDescription="@string/image_of_the_recipe" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/content"
+                android:id="@+id/name_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:layout_editor_absoluteX="10dp"

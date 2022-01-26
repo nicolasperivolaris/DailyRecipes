@@ -27,4 +27,10 @@
         android:label="@string/recipe"
         tools:layout="@layout/show_recipe2" />
 
+    <fragment
+        android:id="@+id/navigation_all_ingredients_list"
+        android:name="com.example.dailyrecipes.fragments.ingredients.AllIngredientFragment"
+        android:label="@string/ingredents_list"
+        tools:layout="@layout/fragment_all_ingredient_list" />
+
 </navigation>

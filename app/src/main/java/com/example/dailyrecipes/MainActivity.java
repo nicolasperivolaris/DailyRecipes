@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_recipe_list, R.id.navigation_recipe_list, R.id.navigation_ingredient_list)
+                R.id.navigation_recipe_list, R.id.navigation_recipe_list, R.id.navigation_all_ingredients_list)
                 .build();
 
         NavHostFragment navHostFragment =
