@@ -27,7 +27,7 @@ public class FTPManager extends ViewModel {
     public void connect(String hostname, String user, String pwd){
         Thread t = new Thread(() -> {
             try {
-                con.connect(hostname);
+                con.connect(hostname, 2121);
                 connected = con.login(user, pwd);
                 con.enterLocalPassiveMode();
                 con.setFileType(FTP.BINARY_FILE_TYPE);

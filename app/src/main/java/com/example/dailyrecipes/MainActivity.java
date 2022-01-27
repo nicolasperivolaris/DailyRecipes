@@ -27,9 +27,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         instance = this;
         ConnectionManager connection = new ViewModelProvider(this).get(ConnectionManager.class);
-        connection.connect("192.168.0.33", 5500);
+        connection.connect("172.30.40.29", 5500);
         FTPManager ftpManager = new ViewModelProvider(this).get(FTPManager.class);
-        ftpManager.connect("192.168.0.23", "admin", "Isib1111");
+        ftpManager.connect("172.30.40.29", "admin", "Isib1111");
         recipesFactory = new RecipesFactory(connection);
 
         setContentView(R.layout.activity_main);
